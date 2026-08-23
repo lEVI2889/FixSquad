@@ -1,0 +1,9 @@
+﻿node_modules/
+.env
+.env.local
+dist/
+build/
+*.log
+
+# Integration Contract for team Discord sharing - DO NOT COMMIT TO GIT
+Week1_Naim_CONTRACT.md
