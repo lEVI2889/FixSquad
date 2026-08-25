@@ -32,3 +32,35 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const fetchProviderServices = async () => {
+    const response = await api.get('/services');
+    return response.data;
+};
+
+export const createService = async (serviceData) => {
+    const response = await api.post('/services', serviceData);
+    return response.data;
+};
+
+export const updateService = async (id, serviceData) => {
+    const response = await api.put(`/services/${id}`, serviceData);
+    return response.data;
+};
+
+export const deleteService = async (id) => {
+    const response = await api.delete(`/services/${id}`);
+    return response.data;
+};
+
+// Mock function to get categories (until category manager is done)
+export const fetchCategories = async () => {
+    return {
+        data: [
+            { id: 1, name: 'Plumbing' },
+            { id: 2, name: 'Electrical' },
+            { id: 3, name: 'Cleaning' },
+            { id: 4, name: 'Carpentry' }
+        ]
+    };
+};
