@@ -5,8 +5,8 @@ require('dotenv').config();
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'service_platform',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'fixsquad_integration_test',
   port: parseInt(process.env.DB_PORT || '3306', 10),
   waitForConnections: true,
   connectionLimit: 10,

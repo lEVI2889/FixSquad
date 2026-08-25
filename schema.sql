@@ -1,5 +1,3 @@
-CREATE DATABASE IF NOT EXISTS service_portfolio_db;
-USE service_portfolio_db;
 
 -- CONTRACT REQUIREMENT (Rohan's Week1_Rohan_CONTRACT.md, Section 1):
 -- id must be INT / PRIMARY KEY so services.provider_id (INT, FK -> users.id)

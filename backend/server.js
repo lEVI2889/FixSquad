@@ -9,15 +9,16 @@ const { protect } = require('./middleware/authMiddleware');
 // Once routes/serviceRoutes.js exists, uncomment the two lines below.
 // This mounts it at /api/services with the `protect` middleware running
 // first, exactly as the contract requires.
-// const serviceRoutes = require('./routes/serviceRoutes');
-// app.use('/api/services', protect, serviceRoutes);
-
 const app = express();
+const serviceRoutes = require('./routes/serviceRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
 
 app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/services', protect, serviceRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Service Portfolio Manager API is running' });
