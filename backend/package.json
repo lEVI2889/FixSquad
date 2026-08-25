@@ -1,0 +1,21 @@
+{
+  "name": "global-category-manager-backend",
+  "version": "1.0.0",
+  "description": "Feature 12 - Global Category Manager Backend using Raw SQL",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node src/database/initDb.js",
+    "test": "node tests/categoryApi.test.js"
+  },
+  "keywords": ["raw-sql", "mysql2", "category-manager", "express"],
+  "author": "Naim",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  }
+}

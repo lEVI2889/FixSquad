@@ -51,9 +51,14 @@ function Navbar() {
               How it works
             </a>
             {isAuthenticated && (
-              <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
-                Dashboard
-              </NavLink>
+              <>
+                <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
+                  Dashboard
+                </NavLink>
+                <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
+                  Categories
+                </NavLink>
+              </>
             )}
             {isAuthenticated && user?.role === 'provider' && (
               <NavLink

@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProviderPortfolio from './pages/ProviderPortfolio';
 import RegisterPage from './pages/RegisterPage';
+import GlobalCategoryManager from './pages/GlobalCategoryManager';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="provider/portfolio" element={<ProviderPortfolio />} />
+          <Route path="admin/categories" element={<GlobalCategoryManager />} />
         </Route>
 
         <Route path="home" element={<Navigate to="/" replace />} />
