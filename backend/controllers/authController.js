@@ -2,8 +2,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+// SPRINT 2 UPDATE (Naim's Week2_Naim_CONTRACT.md):
+// `role` is now included in the JWT payload so that authMiddleware.js can
+// attach req.user.role and the isAdmin middleware can gate admin routes
+// without an extra DB query.
+const generateToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 // POST /api/auth/register
@@ -28,7 +32,8 @@ const register = async (req, res) => {
     );
 
     const newUserId = result.insertId;
-    const token = generateToken(newUserId);
+    // Pass role to generateToken so the JWT payload includes it
+    const token = generateToken(newUserId, role);
 
     return res.status(201).json({
       success: true,
@@ -72,7 +77,8 @@ const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user.id);
+    // Pass role to generateToken so the JWT payload includes it
+    const token = generateToken(user.id, user.role);
 
     return res.status(200).json({
       success: true,

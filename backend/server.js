@@ -3,17 +3,17 @@ const express = require('express');
 const cors = require('cors');
 
 const authRoutes = require('./routes/authRoutes');
-const { protect } = require('./middleware/authMiddleware');
+// SPRINT 2 UPDATE (Naim's Week2_Naim_CONTRACT.md):
+// Destructure isAdmin from authMiddleware to gate the /api/admin namespace.
+const { protect, isAdmin } = require('./middleware/authMiddleware');
 
-// NOTE for Rohan (Week1_Rohan_CONTRACT.md, Section 2):
-// Once routes/serviceRoutes.js exists, uncomment the two lines below.
-// This mounts it at /api/services with the `protect` middleware running
-// first, exactly as the contract requires.
 const app = express();
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
+// Feature 11 (Provider Verification) + Feature 14 (Access Control) — Naim
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -23,6 +23,8 @@ app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/bookings', protect, bookingRoutes);
 app.use('/api/availability', protect, availabilityRoutes);
+// Admin routes: require a valid JWT (`protect`) AND admin role (`isAdmin`)
+app.use('/api/admin', protect, isAdmin, adminRoutes);
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Service Portfolio Manager API is running' });
