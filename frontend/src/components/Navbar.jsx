@@ -61,13 +61,22 @@ function Navbar() {
               </>
             )}
             {isAuthenticated && user?.role === 'provider' && (
-              <NavLink
-                className={navLinkClass}
-                to="/provider/portfolio"
-                onClick={closeMenu}
-              >
-                My services
-              </NavLink>
+              <>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/portfolio"
+                  onClick={closeMenu}
+                >
+                  My services
+                </NavLink>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/operations"
+                  onClick={closeMenu}
+                >
+                  Operations
+                </NavLink>
+              </>
             )}
           </div>
 

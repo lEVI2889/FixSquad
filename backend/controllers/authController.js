@@ -8,7 +8,7 @@ const generateToken = (id) => {
 
 // POST /api/auth/register
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role = 'customer' } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ success: false, message: 'name, email and password are required' });
@@ -23,8 +23,8 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-      [name, email, hashedPassword]
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, role]
     );
 
     const newUserId = result.insertId;
@@ -37,6 +37,7 @@ const register = async (req, res) => {
         id: newUserId,
         name,
         email,
+        role,
         token
       }
     });
@@ -56,7 +57,7 @@ const login = async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      'SELECT id, name, email, password FROM users WHERE email = ?',
+      'SELECT id, name, email, password, role FROM users WHERE email = ?',
       [email]
     );
 
@@ -80,6 +81,7 @@ const login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
         token
       }
     });

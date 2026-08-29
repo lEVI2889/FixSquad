@@ -12,6 +12,8 @@ const { protect } = require('./middleware/authMiddleware');
 const app = express();
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const availabilityRoutes = require('./routes/availabilityRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +21,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/bookings', protect, bookingRoutes);
+app.use('/api/availability', protect, availabilityRoutes);
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Service Portfolio Manager API is running' });
