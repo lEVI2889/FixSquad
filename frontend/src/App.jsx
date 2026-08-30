@@ -7,12 +7,14 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProviderPortfolio from './pages/ProviderPortfolio';
 import RegisterPage from './pages/RegisterPage';
+import ServicesPage from './pages/ServicesPage';
 
 function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="services" element={<ServicesPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
 

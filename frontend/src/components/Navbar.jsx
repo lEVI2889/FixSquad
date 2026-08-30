@@ -47,6 +47,9 @@ function Navbar() {
             <NavLink className={navLinkClass} to="/" onClick={closeMenu} end>
               Home
             </NavLink>
+            <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
+              Services
+            </NavLink>
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>

@@ -22,8 +22,8 @@ function HomePage() {
               in between—without the usual uncertainty.
             </p>
             <div className="hero-actions">
-              <Link className="button button--primary" to="/register">
-                Find a professional <span aria-hidden="true">→</span>
+              <Link className="button button--primary" to="/services">
+                Explore Services & Book <span aria-hidden="true">→</span>
               </Link>
               <a className="button button--text" href="#how-it-works">
                 See how it works <span aria-hidden="true">↓</span>
@@ -52,7 +52,7 @@ function HomePage() {
               </div>
               <div className="ticket-bottom">
                 <span><small>Starts from</small><strong>৳800</strong></span>
-                <span className="mini-button">View profile</span>
+                <Link className="mini-button" to="/services">Book Now</Link>
               </div>
             </div>
             <div className="floating-note floating-note--top">✓ Background checked</div>
@@ -66,16 +66,20 @@ function HomePage() {
           <p className="eyebrow"><span /> Popular services</p>
           <div className="section-heading">
             <h2 id="services-title">The right expert for every task.</h2>
-            <p>Start with one of our most requested household services.</p>
+            <Link className="button button--ghost button--small" to="/services">
+              View All Services →
+            </Link>
           </div>
           <div className="service-grid">
             {services.map((service) => (
-              <article className="service-card" key={service.name}>
-                <span className="service-card__icon">{service.icon}</span>
-                <h3>{service.name}</h3>
-                <p>{service.copy}</p>
-                <span className="service-card__arrow" aria-hidden="true">↗</span>
-              </article>
+              <Link to={`/services?keyword=${encodeURIComponent(service.name)}`} key={service.name}>
+                <article className="service-card">
+                  <span className="service-card__icon">{service.icon}</span>
+                  <h3>{service.name}</h3>
+                  <p>{service.copy}</p>
+                  <span className="service-card__arrow" aria-hidden="true">↗</span>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
