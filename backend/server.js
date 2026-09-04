@@ -11,6 +11,8 @@ const app = express();
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
+
 const availabilityRoutes = require('./routes/availabilityRoutes');
 // Feature 11 (Provider Verification) + Feature 14 (Access Control) — Naim
 const adminRoutes = require('./routes/adminRoutes');
@@ -22,6 +24,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/bookings', protect, bookingRoutes);
+app.use('/api/bookings', protect, bookingDashboardRoutes);
+
 app.use('/api/availability', protect, availabilityRoutes);
 // Admin routes: require a valid JWT (`protect`) AND admin role (`isAdmin`)
 app.use('/api/admin', protect, isAdmin, adminRoutes);

@@ -9,6 +9,9 @@ import ProviderPortfolio from './pages/ProviderPortfolio';
 import RegisterPage from './pages/RegisterPage';
 import GlobalCategoryManager from './pages/GlobalCategoryManager';
 import ProviderOperations from './pages/ProviderOperations';
+import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
+import ProviderJobWorkflow from "./pages/ProviderJobWorkflow";
+
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="provider/portfolio" element={<ProviderPortfolio />} />
           <Route path="provider/operations" element={<ProviderOperations />} />
+          <Route path="customer/bookings" element={<CustomerBookingDashboard />} />
+          <Route path="provider/jobs" element={<ProviderJobWorkflow />} />
+
           <Route path="admin/categories" element={<GlobalCategoryManager />} />
         </Route>
 

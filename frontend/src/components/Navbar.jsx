@@ -55,9 +55,18 @@ function Navbar() {
                 <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
                   Dashboard
                 </NavLink>
-                <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
-                  Categories
-                </NavLink>
+                
+                {user?.role === 'customer' && (
+                  <NavLink className={navLinkClass} to="/customer/bookings" onClick={closeMenu}>
+                    My Bookings
+                  </NavLink>
+                )}
+
+                {user?.role === 'admin' && (
+                  <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
+                    Categories
+                  </NavLink>
+                )}
               </>
             )}
             {isAuthenticated && user?.role === 'provider' && (
@@ -75,6 +84,13 @@ function Navbar() {
                   onClick={closeMenu}
                 >
                   Operations
+                </NavLink>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/jobs"
+                  onClick={closeMenu}
+                >
+                  Job Workflow
                 </NavLink>
               </>
             )}

@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { isKnownStatus, isValidTransition, messageFor } = require('../utils/bookingStatusTransitions');
 
 exports.getProviderBookings = async (req, res) => {
     try {
@@ -23,21 +24,35 @@ exports.updateBookingStatus = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
         
-        // Ensure status is valid
-        if (!['Accepted', 'Rejected'].includes(status)) {
+        if (!isKnownStatus(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status' });
         }
 
-        const [result] = await pool.query(
-            `UPDATE bookings SET status = ? WHERE id = ? AND provider_id = ?`,
-            [status, id, req.user.id]
+        // Fetch current booking to validate transition
+        const [bookings] = await pool.query(
+            `SELECT status FROM bookings WHERE id = ? AND provider_id = ?`,
+            [id, req.user.id]
         );
 
-        if (result.affectedRows === 0) {
+        if (bookings.length === 0) {
             return res.status(404).json({ success: false, message: 'Booking not found or unauthorized' });
         }
 
-        res.json({ success: true, message: `Booking ${status.toLowerCase()} successfully` });
+        const currentStatus = bookings[0].status;
+
+        if (!isValidTransition(currentStatus, status)) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot move booking from '${currentStatus}' to '${status}'`
+            });
+        }
+
+        await pool.query(
+            `UPDATE bookings SET status = ? WHERE id = ?`,
+            [status, id]
+        );
+
+        res.json({ success: true, message: messageFor(status) });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });
