@@ -50,6 +50,9 @@ function Navbar() {
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>
+            <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
+              Book a Service
+            </NavLink>
             {isAuthenticated && (
               <>
                 <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>

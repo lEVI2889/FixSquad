@@ -31,7 +31,31 @@ api.interceptors.response.use(
   },
 );
 
+
+export const searchServices = async (params = {}) => {
+  const response = await api.get('/services/search', { params });
+  return response.data;
+};
+
+export const fetchServiceById = async (id) => {
+  const response = await api.get(`/services/${id}`);
+  return response.data;
+};
+
+export const checkAvailability = async (providerId, date) => {
+  const response = await api.get('/bookings/check-availability', {
+    params: { provider_id: providerId, date }
+  });
+  return response.data;
+};
+
+export const createBooking = async (bookingData) => {
+  const response = await api.post('/bookings', bookingData);
+  return response.data;
+};
+
 export default api;
+
 
 export const fetchProviderServices = async () => {
     const response = await api.get('/services');

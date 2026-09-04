@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProviderPortfolio from './pages/ProviderPortfolio';
 import RegisterPage from './pages/RegisterPage';
+import ServicesPage from './pages/ServicesPage';
 import GlobalCategoryManager from './pages/GlobalCategoryManager';
 import ProviderOperations from './pages/ProviderOperations';
 import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
@@ -20,6 +21,7 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="services" element={<ServicesPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
