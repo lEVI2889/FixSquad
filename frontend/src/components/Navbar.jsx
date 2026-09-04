@@ -50,24 +50,52 @@ function Navbar() {
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>
+            <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
+              Book a Service
+            </NavLink>
             {isAuthenticated && (
               <>
                 <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
                   Dashboard
                 </NavLink>
-                <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
-                  Categories
-                </NavLink>
+                
+                {user?.role === 'customer' && (
+                  <NavLink className={navLinkClass} to="/customer/bookings" onClick={closeMenu}>
+                    My Bookings
+                  </NavLink>
+                )}
+
+                {user?.role === 'admin' && (
+                  <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
+                    Categories
+                  </NavLink>
+                )}
               </>
             )}
             {isAuthenticated && user?.role === 'provider' && (
-              <NavLink
-                className={navLinkClass}
-                to="/provider/portfolio"
-                onClick={closeMenu}
-              >
-                My services
-              </NavLink>
+              <>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/portfolio"
+                  onClick={closeMenu}
+                >
+                  My services
+                </NavLink>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/operations"
+                  onClick={closeMenu}
+                >
+                  Operations
+                </NavLink>
+                <NavLink
+                  className={navLinkClass}
+                  to="/provider/jobs"
+                  onClick={closeMenu}
+                >
+                  Job Workflow
+                </NavLink>
+              </>
             )}
           </div>
 

@@ -15,4 +15,7 @@ router.route('/:id')
     .put(serviceController.updateService)
     .delete(serviceController.deleteService);
 
+router.get('/search', serviceController.searchServices);
+router.get('/:id', serviceController.getServiceById);
+
 module.exports = router;

@@ -105,9 +105,286 @@ const deleteService = async (req, res) => {
     }
 };
 
+const searchServices = async (req, res) => {
+  try {
+    const { keyword, category_id, min_price, max_price, sort } = req.query;
+
+    let sql = `
+      SELECT 
+        s.id,
+        s.provider_id,
+        s.category_id,
+        s.name,
+        s.description,
+        s.base_price,
+        s.created_at,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        u.name AS provider_name,
+        4.8 AS provider_rating,
+        12 AS total_reviews
+      FROM services s
+      LEFT JOIN categories c ON s.category_id = c.id
+      LEFT JOIN users u ON s.provider_id = u.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    // Dynamic keyword search across service name, description, and category name
+    if (keyword && keyword.trim()) {
+      const searchTerm = `%${keyword.trim()}%`;
+      sql += ` AND (s.name LIKE ? OR s.description LIKE ? OR c.name LIKE ?)`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    // Dynamic category filter
+    if (category_id && category_id !== 'all' && !isNaN(category_id)) {
+      sql += ` AND s.category_id = ?`;
+      params.push(Number(category_id));
+    }
+
+    // Dynamic price range filters
+    if (min_price && !isNaN(min_price)) {
+      sql += ` AND s.base_price >= ?`;
+      params.push(Number(min_price));
+    }
+    if (max_price && !isNaN(max_price)) {
+      sql += ` AND s.base_price <= ?`;
+      params.push(Number(max_price));
+    }
+
+    // Dynamic sorting
+    if (sort === 'price_asc') {
+      sql += ` ORDER BY s.base_price ASC`;
+    } else if (sort === 'price_desc') {
+      sql += ` ORDER BY s.base_price DESC`;
+    } else if (sort === 'rating_desc') {
+      sql += ` ORDER BY u.rating DESC, s.created_at DESC`;
+    } else {
+      sql += ` ORDER BY s.created_at DESC`;
+    }
+
+    const [services] = await pool.query(sql, params);
+
+    // Apply in-memory dynamic filter if running on fallback store
+    let filtered = services;
+    if (keyword && keyword.trim()) {
+      const term = keyword.trim().toLowerCase();
+      filtered = filtered.filter(s => 
+        (s.name && s.name.toLowerCase().includes(term)) ||
+        (s.description && s.description.toLowerCase().includes(term)) ||
+        (s.category_name && s.category_name.toLowerCase().includes(term))
+      );
+    }
+    if (category_id && category_id !== 'all' && !isNaN(category_id)) {
+      filtered = filtered.filter(s => Number(s.category_id) === Number(category_id));
+    }
+    if (min_price && !isNaN(min_price)) {
+      filtered = filtered.filter(s => Number(s.base_price) >= Number(min_price));
+    }
+    if (max_price && !isNaN(max_price)) {
+      filtered = filtered.filter(s => Number(s.base_price) <= Number(max_price));
+    }
+    if (sort === 'price_asc') {
+      filtered.sort((a, b) => Number(a.base_price) - Number(b.base_price));
+    } else if (sort === 'price_desc') {
+      filtered.sort((a, b) => Number(b.base_price) - Number(a.base_price));
+    } else if (sort === 'rating_desc') {
+      filtered.sort((a, b) => Number(b.provider_rating || 0) - Number(a.provider_rating || 0));
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: filtered.length,
+      data: filtered
+    });
+  } catch (error) {
+    console.error('Error searching services:', error);
+    return res.status(500).json({ success: false, message: 'Server Error during service search' });
+  }
+};
+
+const getServiceById = async (req, res) => {
+  try {
+    const serviceId = Number(req.params.id);
+    const sql = `
+      SELECT 
+        s.id,
+        s.provider_id,
+        s.category_id,
+        s.name,
+        s.description,
+        s.base_price,
+        s.created_at,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        u.name AS provider_name,
+        4.8 AS provider_rating,
+        12 AS total_reviews
+      FROM services s
+      LEFT JOIN categories c ON s.category_id = c.id
+      LEFT JOIN users u ON s.provider_id = u.id
+      WHERE s.id = ?
+    `;
+    const [services] = await pool.query(sql, [serviceId]);
+
+    if (!services || services.length === 0) {
+      return res.status(404).json({ success: false, message: 'Service not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: services[0]
+    });
+  } catch (error) {
+    console.error('Error fetching service:', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+
+
 module.exports = {
-    getProviderServices,
-    createService,
-    updateService,
-    deleteService
+  getProviderServices,
+  createService,
+  updateService,
+  deleteService,
+  searchServices,
+  getServiceById
+};
+
+exports.searchServices = async (req, res) => {
+  try {
+    const { keyword, category_id, min_price, max_price, sort } = req.query;
+
+    let sql = `
+      SELECT 
+        s.id,
+        s.provider_id,
+        s.category_id,
+        s.name,
+        s.description,
+        s.base_price,
+        s.created_at,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        u.name AS provider_name,
+        4.8 AS provider_rating,
+        12 AS total_reviews
+      FROM services s
+      LEFT JOIN categories c ON s.category_id = c.id
+      LEFT JOIN users u ON s.provider_id = u.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    // Dynamic keyword search across service name, description, and category name
+    if (keyword && keyword.trim()) {
+      const searchTerm = `%${keyword.trim()}%`;
+      sql += ` AND (s.name LIKE ? OR s.description LIKE ? OR c.name LIKE ?)`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    // Dynamic category filter
+    if (category_id && category_id !== 'all' && !isNaN(category_id)) {
+      sql += ` AND s.category_id = ?`;
+      params.push(Number(category_id));
+    }
+
+    // Dynamic price range filters
+    if (min_price && !isNaN(min_price)) {
+      sql += ` AND s.base_price >= ?`;
+      params.push(Number(min_price));
+    }
+    if (max_price && !isNaN(max_price)) {
+      sql += ` AND s.base_price <= ?`;
+      params.push(Number(max_price));
+    }
+
+    // Dynamic sorting
+    if (sort === 'price_asc') {
+      sql += ` ORDER BY s.base_price ASC`;
+    } else if (sort === 'price_desc') {
+      sql += ` ORDER BY s.base_price DESC`;
+    } else if (sort === 'rating_desc') {
+      sql += ` ORDER BY u.rating DESC, s.created_at DESC`;
+    } else {
+      sql += ` ORDER BY s.created_at DESC`;
+    }
+
+    const [services] = await pool.query(sql, params);
+
+    // Apply in-memory dynamic filter if running on fallback store
+    let filtered = services;
+    if (keyword && keyword.trim()) {
+      const term = keyword.trim().toLowerCase();
+      filtered = filtered.filter(s => 
+        (s.name && s.name.toLowerCase().includes(term)) ||
+        (s.description && s.description.toLowerCase().includes(term)) ||
+        (s.category_name && s.category_name.toLowerCase().includes(term))
+      );
+    }
+    if (category_id && category_id !== 'all' && !isNaN(category_id)) {
+      filtered = filtered.filter(s => Number(s.category_id) === Number(category_id));
+    }
+    if (min_price && !isNaN(min_price)) {
+      filtered = filtered.filter(s => Number(s.base_price) >= Number(min_price));
+    }
+    if (max_price && !isNaN(max_price)) {
+      filtered = filtered.filter(s => Number(s.base_price) <= Number(max_price));
+    }
+    if (sort === 'price_asc') {
+      filtered.sort((a, b) => Number(a.base_price) - Number(b.base_price));
+    } else if (sort === 'price_desc') {
+      filtered.sort((a, b) => Number(b.base_price) - Number(a.base_price));
+    } else if (sort === 'rating_desc') {
+      filtered.sort((a, b) => Number(b.provider_rating || 0) - Number(a.provider_rating || 0));
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: filtered.length,
+      data: filtered
+    });
+  } catch (error) {
+    console.error('Error searching services:', error);
+    return res.status(500).json({ success: false, message: 'Server Error during service search' });
+  }
+};
+exports.getServiceById = async (req, res) => {
+  try {
+    const serviceId = Number(req.params.id);
+    const sql = `
+      SELECT 
+        s.id,
+        s.provider_id,
+        s.category_id,
+        s.name,
+        s.description,
+        s.base_price,
+        s.created_at,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        u.name AS provider_name,
+        4.8 AS provider_rating,
+        12 AS total_reviews
+      FROM services s
+      LEFT JOIN categories c ON s.category_id = c.id
+      LEFT JOIN users u ON s.provider_id = u.id
+      WHERE s.id = ?
+    `;
+    const [services] = await pool.query(sql, [serviceId]);
+
+    if (!services || services.length === 0) {
+      return res.status(404).json({ success: false, message: 'Service not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: services[0]
+    });
+  } catch (error) {
+    console.error('Error fetching service:', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
 };

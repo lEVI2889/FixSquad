@@ -31,7 +31,31 @@ api.interceptors.response.use(
   },
 );
 
+
+export const searchServices = async (params = {}) => {
+  const response = await api.get('/services/search', { params });
+  return response.data;
+};
+
+export const fetchServiceById = async (id) => {
+  const response = await api.get(`/services/${id}`);
+  return response.data;
+};
+
+export const checkAvailability = async (providerId, date) => {
+  const response = await api.get('/bookings/check-availability', {
+    params: { provider_id: providerId, date }
+  });
+  return response.data;
+};
+
+export const createBooking = async (bookingData) => {
+  const response = await api.post('/bookings', bookingData);
+  return response.data;
+};
+
 export default api;
+
 
 export const fetchProviderServices = async () => {
     const response = await api.get('/services');
@@ -63,4 +87,29 @@ export const fetchCategories = async () => {
             { id: 4, name: 'Carpentry' }
         ]
     };
+};
+
+export const fetchPendingBookings = async () => {
+    const response = await api.get('/bookings/provider/pending');
+    return response.data;
+};
+
+export const updateBookingStatus = async (id, status) => {
+    const response = await api.put(`/bookings/${id}/status`, { status });
+    return response.data;
+};
+
+export const fetchAvailability = async () => {
+    const response = await api.get('/availability');
+    return response.data;
+};
+
+export const addAvailabilityBlock = async (data) => {
+    const response = await api.post('/availability', data);
+    return response.data;
+};
+
+export const removeAvailabilityBlock = async (id) => {
+    const response = await api.delete(`/availability/${id}`);
+    return response.data;
 };
