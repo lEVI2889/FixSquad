@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import api from '../services/api';
+import MessagingModal from '../components/MessagingModal';
 import { fetchCustomerBookings } from '../services/bookingApi';
 
 const COLUMNS = ['Pending', 'Accepted', 'In-Progress', 'Completed'];
@@ -8,7 +10,7 @@ function formatDate(dateStr) {
   return Number.isNaN(d.getTime()) ? dateStr : d.toLocaleDateString();
 }
 
-function BookingCard({ booking }) {
+function BookingCard({ booking, onMessage, onInvoice }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-4 hover:shadow-md transition-shadow">
       <div className="font-bold text-lg text-slate-900 mb-1">{booking.service_name}</div>
@@ -25,6 +27,18 @@ function BookingCard({ booking }) {
             <span className="font-bold text-indigo-700 text-lg">${Number(booking.total_price).toFixed(2)}</span>
         </div>
       )}
+      <div className="flex gap-2 mt-3">
+        {(booking.status === 'Accepted' || booking.status === 'In-Progress') && (
+          <button onClick={() => onMessage(booking.id)} className="w-full py-2 bg-indigo-50 text-indigo-700 rounded text-sm font-semibold hover:bg-indigo-100 transition-colors">
+            Message Provider
+          </button>
+        )}
+        {booking.status === 'Completed' && (
+          <button onClick={() => onInvoice(booking.id)} className="w-full py-2 bg-green-50 text-green-700 rounded text-sm font-semibold hover:bg-green-100 transition-colors">
+            Download Invoice
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -33,6 +47,21 @@ export default function CustomerBookingDashboard() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeMessageBookingId, setActiveMessageBookingId] = useState(null);
+
+  const handleDownloadInvoice = async (bookingId) => {
+    try {
+      const response = await api.get(`/invoices/${bookingId}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice-${bookingId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error('Failed to download invoice:', err);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -85,7 +114,7 @@ export default function CustomerBookingDashboard() {
                     </div>
                 )}
                 {byStatus[status].map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
+                <BookingCard key={booking.id} booking={booking} onMessage={setActiveMessageBookingId} onInvoice={handleDownloadInvoice} />
                 ))}
             </div>
           </div>
@@ -97,11 +126,12 @@ export default function CustomerBookingDashboard() {
           <h2 className="text-xl font-bold text-slate-900 mb-6 border-b pb-2">Other History</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {otherStatuses.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
+              <BookingCard key={booking.id} booking={booking} onMessage={setActiveMessageBookingId} onInvoice={handleDownloadInvoice} />
             ))}
           </div>
         </div>
       )}
+      {activeMessageBookingId && <MessagingModal bookingId={activeMessageBookingId} onClose={() => setActiveMessageBookingId(null)} />}
     </main>
   );
 }

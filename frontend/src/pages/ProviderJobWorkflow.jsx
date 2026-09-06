@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import MessagingModal from '../components/MessagingModal';
 import { fetchProviderBookings, updateBookingStatus } from '../services/bookingApi';
 
 // Mirrors the backend's VALID_TRANSITIONS in controllers/bookingController.js.
@@ -29,6 +30,7 @@ export default function ProviderJobWorkflow() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [activeMessageBookingId, setActiveMessageBookingId] = useState(null);
 
   const loadBookings = () => {
     setLoading(true);
@@ -91,6 +93,13 @@ export default function ProviderJobWorkflow() {
                 </div>
               </div>
 
+              <div className="flex gap-2 w-full mt-3">
+                {(booking.status === 'Accepted' || booking.status === 'In-Progress') && (
+                  <button onClick={() => setActiveMessageBookingId(booking.id)} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded text-sm font-semibold hover:bg-indigo-100 transition-colors">
+                    Message Customer
+                  </button>
+                )}
+              </div>
               {actions.length > 0 && (
                 <div className="flex gap-3 md:flex-col lg:flex-row md:shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100">
                   {actions.map((action) => (
@@ -110,6 +119,7 @@ export default function ProviderJobWorkflow() {
           );
         })}
       </div>
+      {activeMessageBookingId && <MessagingModal bookingId={activeMessageBookingId} onClose={() => setActiveMessageBookingId(null)} />}
     </main>
   );
 }
