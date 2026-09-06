@@ -249,3 +249,37 @@ exports.createBooking = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error while creating booking' });
   }
 };
+
+exports.cancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customerId = req.user.id;
+
+    const [bookings] = await pool.query(
+      `SELECT * FROM bookings WHERE id = ? AND customer_id = ?`,
+      [id, customerId]
+    );
+
+    if (bookings.length === 0) {
+      return res.status(404).json({ success: false, message: 'Booking not found or unauthorized' });
+    }
+
+    const booking = bookings[0];
+    if (booking.status !== 'Pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Only 'Pending' requests can be cancelled. Current status is '${booking.status}'`
+      });
+    }
+
+    await pool.query(
+      `UPDATE bookings SET status = 'Cancelled' WHERE id = ?`,
+      [id]
+    );
+
+    res.json({ success: true, message: 'Booking request cancelled successfully' });
+  } catch (err) {
+    console.error('Error cancelling booking:', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};

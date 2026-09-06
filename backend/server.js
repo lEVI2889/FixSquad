@@ -13,6 +13,8 @@ const categoryRoutes = require('./src/routes/categoryRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const disputeRoutes = require('./routes/disputeRoutes');
 const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 
 const availabilityRoutes = require('./routes/availabilityRoutes');
@@ -28,7 +30,10 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/bookings', protect, bookingRoutes);
 app.use('/api/messages', protect, messageRoutes);
 app.use('/api/invoices', protect, invoiceRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/disputes', protect, disputeRoutes);
 app.use('/api/bookings', protect, bookingDashboardRoutes);
+
 
 app.use('/api/availability', protect, availabilityRoutes);
 // Admin routes: require a valid JWT (`protect`) AND admin role (`isAdmin`)
