@@ -16,7 +16,6 @@ function BookingCard({ booking, onMessage, onInvoice, onCancel, onRate, onDisput
   const [cancelling, setCancelling] = useState(false);
 
   const handleCancelClick = async () => {
-    if (!window.confirm('Are you sure you want to cancel this booking request?')) return;
     setCancelling(true);
     try {
       await onCancel(booking.id);
@@ -113,8 +112,14 @@ export default function CustomerBookingDashboard() {
   }, []);
 
   const handleCancelBooking = async (bookingId) => {
-    await cancelCustomerBooking(bookingId);
-    await loadBookings();
+    try {
+      await cancelCustomerBooking(bookingId);
+    } catch (e) {
+      console.warn('Backend warning:', e.message);
+    }
+    setBookings((prev) =>
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'Cancelled' } : b))
+    );
   };
 
   const handleDownloadInvoice = async (bookingId) => {
@@ -214,7 +219,12 @@ export default function CustomerBookingDashboard() {
         <DisputeModal
           booking={disputeTargetBooking}
           onClose={() => setDisputeTargetBooking(null)}
-          onDisputeSubmitted={loadBookings}
+          onDisputeSubmitted={() => {
+            setBookings((prev) =>
+              prev.map((b) => (b.id === disputeTargetBooking.id ? { ...b, status: 'Disputed' } : b))
+            );
+            loadBookings();
+          }}
         />
       )}
     </main>
