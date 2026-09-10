@@ -18,6 +18,8 @@ const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 // Feature 11 (Provider Verification) + Feature 14 (Access Control) — Naim
 const adminRoutes = require('./routes/adminRoutes');
+// Sprint 4: Customer Text Reviews — Rohan (Week4_Rohan_CONTRACT.md)
+const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +35,8 @@ app.use('/api/bookings', protect, bookingDashboardRoutes);
 app.use('/api/availability', protect, availabilityRoutes);
 // Admin routes: require a valid JWT (`protect`) AND admin role (`isAdmin`)
 app.use('/api/admin', protect, isAdmin, adminRoutes);
+// Review routes: public GET + protected POST — protect applied per-route inside reviewRoutes.js
+app.use('/api/reviews', reviewRoutes);
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Service Portfolio Manager API is running' });

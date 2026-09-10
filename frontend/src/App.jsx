@@ -12,6 +12,8 @@ import GlobalCategoryManager from './pages/GlobalCategoryManager';
 import ProviderOperations from './pages/ProviderOperations';
 import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
 import ProviderJobWorkflow from "./pages/ProviderJobWorkflow";
+// Sprint 4: Customer Text Reviews — Rohan (Week4_Rohan_CONTRACT.md)
+import ProviderPublicProfile from './pages/ProviderPublicProfile';
 
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="services" element={<ServicesPage />} />
+        {/* Sprint 4: Public Provider Profile — Rohan (Week4_Rohan_CONTRACT.md) */}
+        <Route path="provider/:providerId/profile" element={<ProviderPublicProfile />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
