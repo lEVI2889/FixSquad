@@ -70,12 +70,12 @@ function HomePage() {
           </div>
           <div className="service-grid">
             {services.map((service) => (
-              <article className="service-card" key={service.name}>
+              <Link to={`/services?keyword=${service.name}`} className="service-card" key={service.name} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <span className="service-card__icon">{service.icon}</span>
                 <h3>{service.name}</h3>
                 <p>{service.copy}</p>
                 <span className="service-card__arrow" aria-hidden="true">↗</span>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

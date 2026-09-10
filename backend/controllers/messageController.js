@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const xss = require('xss');
 
 exports.getMessages = async (req, res) => {
   try {
@@ -40,6 +41,9 @@ exports.sendMessage = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Message text cannot be empty' });
     }
 
+    // Sanitize input to prevent XSS
+    const sanitizedMessage = xss(message_text.trim());
+
     // Verify user is part of the booking
     const [bookings] = await pool.query(
       'SELECT id FROM bookings WHERE id = ? AND (customer_id = ? OR provider_id = ?)',
@@ -50,9 +54,10 @@ exports.sendMessage = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized to send messages for this booking.' });
     }
 
+    // Use parameterized queries to prevent SQL injection
     const [result] = await pool.query(
       'INSERT INTO messages (booking_id, sender_id, message_text) VALUES (?, ?, ?)',
-      [bookingId, userId, message_text.trim()]
+      [bookingId, userId, sanitizedMessage]
     );
 
     const [newMessage] = await pool.query(`
