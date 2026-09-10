@@ -277,7 +277,7 @@ function ServicesPage() {
                 </div>
 
                 <h3 className="catalog-card__title">{service.name}</h3>
-                <p className="catalog-card__desc">{service.description}</p>
+                {/* Description removed for cleaner UI */}
 
                 <div className="catalog-provider-info">
                   <div className="provider-avatar">

@@ -11,6 +11,8 @@ const app = express();
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const invoiceRoutes = require('./routes/invoiceRoutes');
 const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 
 const availabilityRoutes = require('./routes/availabilityRoutes');
@@ -24,6 +26,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/bookings', protect, bookingRoutes);
+app.use('/api/messages', protect, messageRoutes);
+app.use('/api/invoices', protect, invoiceRoutes);
 app.use('/api/bookings', protect, bookingDashboardRoutes);
 
 app.use('/api/availability', protect, availabilityRoutes);
