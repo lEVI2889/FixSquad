@@ -21,9 +21,8 @@ const protect = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Attach both id AND role — existing routes only read req.user.id, which
-    // is unchanged. The new isAdmin middleware reads req.user.role.
+    const secret = process.env.JWT_SECRET || 'fixsquad_secret_key_123';
+    const decoded = jwt.verify(token, secret);
     req.user = { id: decoded.id, role: decoded.role };
     next();
   } catch (err) {

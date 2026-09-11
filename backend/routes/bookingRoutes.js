@@ -9,5 +9,7 @@ router.put('/:id/status', updateBookingStatus);
 
 router.get('/check-availability', bookingController2.checkAvailability);
 router.post('/', protect, bookingController2.createBooking);
+router.put('/:id/cancel', protect, bookingController2.cancelBooking);
 
 module.exports = router;
+

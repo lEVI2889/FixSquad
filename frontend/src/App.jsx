@@ -12,6 +12,8 @@ import GlobalCategoryManager from './pages/GlobalCategoryManager';
 import ProviderOperations from './pages/ProviderOperations';
 import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
 import ProviderJobWorkflow from "./pages/ProviderJobWorkflow";
+// Sprint 3 — Naim (Week3_Naim_CONTRACT.md)
+import AdminDisputeDesk from './pages/AdminDisputeDesk';
 
 
 function App() {
@@ -31,6 +33,7 @@ function App() {
           <Route path="provider/jobs" element={<ProviderJobWorkflow />} />
 
           <Route path="admin/categories" element={<GlobalCategoryManager />} />
+          <Route path="admin/disputes" element={<AdminDisputeDesk />} />
         </Route>
 
         <Route path="home" element={<Navigate to="/" replace />} />
