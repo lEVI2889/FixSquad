@@ -148,11 +148,3 @@ export const fetchDisputedBookings = async () => {
   const response = await api.get('/admin/disputes');
   return response.data;
 };
-
-// PUT /api/admin/disputes/:id/resolve — override disputed booking status (admin only)
-// status: 'Completed' | 'Cancelled' | 'In-Progress'
-export const resolveDispute = async (id, status) => {
-  const response = await api.put(`/admin/disputes/${id}/resolve`, { status });
-  return response.data;
-};
-
