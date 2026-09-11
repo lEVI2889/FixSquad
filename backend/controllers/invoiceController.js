@@ -92,7 +92,7 @@ exports.downloadInvoice = async (req, res) => {
     const totalY = doc.y;
     doc.rect(300, totalY, 250, 40).fillAndStroke('#eef2ff', '#c7d2fe');
     doc.fillColor('#4338ca').fontSize(16).font('Helvetica-Bold');
-    doc.text(`Total Paid: ৳${Number(invoice.amount).toFixed(2)}`, 315, totalY + 13, { align: 'left' });
+    doc.text(`Total Paid: BDT ${Number(invoice.amount).toFixed(2)}`, 315, totalY + 13, { align: 'left' });
 
     doc.moveDown(5);
 
