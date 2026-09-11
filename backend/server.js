@@ -4,8 +4,6 @@ const cors = require('cors');
 const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
-// SPRINT 2 UPDATE (Naim's Week2_Naim_CONTRACT.md):
-// Destructure isAdmin from authMiddleware to gate the /api/admin namespace.
 const { protect, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -19,14 +17,11 @@ const disputeRoutes = require('./routes/disputeRoutes');
 const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 
 const availabilityRoutes = require('./routes/availabilityRoutes');
-// Feature 11 (Provider Verification) + Feature 14 (Access Control) — Naim
 const adminRoutes = require('./routes/adminRoutes');
-// Sprint 3: Image Upload — Naim (Week3_Naim_CONTRACT.md)
 const uploadRoutes = require('./routes/uploadRoutes');
 
 app.use(cors());
 app.use(express.json());
-// Serve uploaded images as static files at /uploads/<filename>
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
@@ -39,11 +34,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/disputes', protect, disputeRoutes);
 app.use('/api/bookings', protect, bookingDashboardRoutes);
 
-
 app.use('/api/availability', protect, availabilityRoutes);
-// Admin routes: require a valid JWT (`protect`) AND admin role (`isAdmin`)
 app.use('/api/admin', protect, isAdmin, adminRoutes);
-// Upload routes: protect applied per-route inside uploadRoutes.js
 app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {

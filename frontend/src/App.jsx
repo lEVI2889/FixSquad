@@ -12,9 +12,8 @@ import GlobalCategoryManager from './pages/GlobalCategoryManager';
 import ProviderOperations from './pages/ProviderOperations';
 import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
 import ProviderJobWorkflow from "./pages/ProviderJobWorkflow";
-// Sprint 3 — Naim (Week3_Naim_CONTRACT.md)
 import AdminDisputeDesk from './pages/AdminDisputeDesk';
-
+import ProviderPublicProfile from './pages/ProviderPublicProfile';
 
 function App() {
   return (
@@ -24,6 +23,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="services" element={<ServicesPage />} />
+        <Route path="provider/:providerId/profile" element={<ProviderPublicProfile />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />

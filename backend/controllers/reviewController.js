@@ -1,13 +1,11 @@
 const pool = require('../config/db');
 
-/**
- * Submit a rating and review for a completed booking
- * POST /api/reviews
- */
 exports.createReview = async (req, res) => {
   try {
     const customerId = req.user.id;
-    const { booking_id, rating, comment } = req.body;
+    // support both Wasik and Naim's payload keys
+    const { booking_id, rating, comment, review_text } = req.body;
+    const finalComment = comment || review_text || '';
 
     const numRating = Number(rating);
     if (!booking_id || isNaN(numRating) || numRating < 1 || numRating > 5) {
@@ -17,7 +15,11 @@ exports.createReview = async (req, res) => {
       });
     }
 
-    // 1. Verify booking exists, belongs to customer, and is completed
+    const trimmed = finalComment.trim();
+    if (trimmed.length > 1000) {
+      return res.status(400).json({ success: false, message: 'Review must not exceed 1000 characters.' });
+    }
+
     const [bookings] = await pool.query(
       `SELECT id, customer_id, provider_id, service_id, status FROM bookings WHERE id = ?`,
       [booking_id]
@@ -40,7 +42,6 @@ exports.createReview = async (req, res) => {
       });
     }
 
-    // 2. Check if a review already exists for this booking
     const [existing] = await pool.query(
       `SELECT id FROM reviews WHERE booking_id = ?`,
       [booking_id]
@@ -53,14 +54,12 @@ exports.createReview = async (req, res) => {
       });
     }
 
-    // 3. Insert review
     const [result] = await pool.query(
       `INSERT INTO reviews (booking_id, customer_id, provider_id, service_id, rating, comment)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [booking_id, customerId, booking.provider_id, booking.service_id, numRating, comment ? comment.trim() : null]
+      [booking_id, customerId, booking.provider_id, booking.service_id, numRating, trimmed || null]
     );
 
-    // 4. Recalculate provider aggregate rating
     const [stats] = await pool.query(
       `SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE provider_id = ?`,
       [booking.provider_id]
@@ -69,14 +68,13 @@ exports.createReview = async (req, res) => {
     const avgRating = stats[0].avg_rating ? parseFloat(stats[0].avg_rating).toFixed(2) : numRating.toFixed(2);
     const totalReviews = stats[0].total_reviews || 1;
 
-    // Update users table with recalculated score
     try {
       await pool.query(
         `UPDATE users SET rating = ? WHERE id = ?`,
         [avgRating, booking.provider_id]
       );
     } catch (updateErr) {
-      console.warn('Could not update users.rating column (may require migration):', updateErr.message);
+      console.warn('Could not update users.rating column:', updateErr.message);
     }
 
     return res.status(201).json({
@@ -86,7 +84,7 @@ exports.createReview = async (req, res) => {
         id: result.insertId,
         booking_id,
         rating: numRating,
-        comment,
+        comment: trimmed,
         provider_aggregate_rating: Number(avgRating),
         total_reviews: totalReviews
       }
@@ -94,28 +92,10 @@ exports.createReview = async (req, res) => {
 
   } catch (error) {
     console.error('Error creating review:', error);
-    if (error.code === 'ECONNREFUSED' || error.code === 'PROTOCOL_CONNECTION_LOST' || (error.message && error.message.includes('connect'))) {
-      return res.status(201).json({
-        success: true,
-        message: 'Thank you! Your rating and review have been submitted.',
-        data: {
-          id: Date.now(),
-          booking_id: req.body.booking_id,
-          rating: Number(req.body.rating),
-          comment: req.body.comment,
-          provider_aggregate_rating: Number(req.body.rating),
-          total_reviews: 1
-        }
-      });
-    }
     return res.status(500).json({ success: false, message: 'Server error while submitting review' });
   }
 };
 
-/**
- * Get review for a specific booking
- * GET /api/reviews/booking/:bookingId
- */
 exports.getBookingReview = async (req, res) => {
   try {
     const { bookingId } = req.params;
@@ -139,10 +119,6 @@ exports.getBookingReview = async (req, res) => {
   }
 };
 
-/**
- * Get all reviews for a provider
- * GET /api/reviews/provider/:providerId
- */
 exports.getProviderReviews = async (req, res) => {
   try {
     const { providerId } = req.params;
@@ -160,6 +136,24 @@ exports.getProviderReviews = async (req, res) => {
     return res.status(200).json({ success: true, data: reviews });
   } catch (error) {
     console.error('Error fetching provider reviews:', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+exports.getMyReviewedBookingIds = async (req, res) => {
+  try {
+    const customer_id = req.user.id;
+
+    const [rows] = await pool.query(
+      `SELECT booking_id FROM reviews WHERE customer_id = ?`,
+      [customer_id]
+    );
+
+    const bookingIds = rows.map((r) => r.booking_id);
+
+    return res.status(200).json({ success: true, data: bookingIds });
+  } catch (err) {
+    console.error('getMyReviewedBookingIds error:', err.message);
     return res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
