@@ -27,23 +27,24 @@ const getProviderServices = async (req, res) => {
 const createService = async (req, res) => {
     try {
         const providerId = req.user.id;
-        const { category_id, name, description, base_price } = req.body;
+        // image_url is optional — populated after a separate POST /api/upload/service-image call
+        const { category_id, name, description, base_price, image_url = null } = req.body;
 
         if (!category_id || !name || base_price === undefined) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
 
         const query = `
-            INSERT INTO services (provider_id, category_id, name, description, base_price) 
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO services (provider_id, category_id, name, description, base_price, image_url) 
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
         
-        const [result] = await pool.query(query, [providerId, category_id, name, description, base_price]);
+        const [result] = await pool.query(query, [providerId, category_id, name, description, base_price, image_url]);
         
         res.status(201).json({ 
             success: true, 
             message: 'Service created successfully',
-            data: { id: result.insertId, provider_id: providerId, category_id, name, description, base_price }
+            data: { id: result.insertId, provider_id: providerId, category_id, name, description, base_price, image_url }
         });
     } catch (error) {
         console.error('Error creating service:', error);
@@ -51,24 +52,29 @@ const createService = async (req, res) => {
     }
 };
 
+
 // Update an existing service
 const updateService = async (req, res) => {
     try {
         const providerId = req.user.id;
         const serviceId = req.params.id;
-        const { category_id, name, description, base_price } = req.body;
+        // image_url is optional — pass it to update the image, omit to leave it unchanged
+        const { category_id, name, description, base_price, image_url } = req.body;
 
         if (!category_id || !name || base_price === undefined) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
 
-        const query = `
-            UPDATE services 
-            SET category_id = ?, name = ?, description = ?, base_price = ? 
-            WHERE id = ? AND provider_id = ?
-        `;
-        
-        const [result] = await pool.query(query, [category_id, name, description, base_price, serviceId, providerId]);
+        // Only include image_url in the SET clause if the caller explicitly sent it
+        const hasImage = image_url !== undefined;
+        const query = hasImage
+            ? `UPDATE services SET category_id = ?, name = ?, description = ?, base_price = ?, image_url = ? WHERE id = ? AND provider_id = ?`
+            : `UPDATE services SET category_id = ?, name = ?, description = ?, base_price = ? WHERE id = ? AND provider_id = ?`;
+        const params = hasImage
+            ? [category_id, name, description, base_price, image_url, serviceId, providerId]
+            : [category_id, name, description, base_price, serviceId, providerId];
+
+        const [result] = await pool.query(query, params);
         
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Service not found or unauthorized' });
@@ -80,6 +86,7 @@ const updateService = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
+
 
 // Delete a service
 const deleteService = async (req, res) => {

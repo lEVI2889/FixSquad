@@ -13,7 +13,8 @@ import AdminSecurityDashboard from './pages/AdminSecurityDashboard';
 import ProviderOperations from './pages/ProviderOperations';
 import CustomerBookingDashboard from "./pages/CustomerBookingDashboard";
 import ProviderJobWorkflow from "./pages/ProviderJobWorkflow";
-
+import AdminDisputeDesk from './pages/AdminDisputeDesk';
+import ProviderPublicProfile from './pages/ProviderPublicProfile';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="services" element={<ServicesPage />} />
+        <Route path="provider/:providerId/profile" element={<ProviderPublicProfile />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
@@ -33,6 +35,7 @@ function App() {
 
           <Route path="admin/categories" element={<GlobalCategoryManager />} />
           <Route path="admin/security" element={<AdminSecurityDashboard />} />
+          <Route path="admin/disputes" element={<AdminDisputeDesk />} />
         </Route>
 
         <Route path="home" element={<Navigate to="/" replace />} />

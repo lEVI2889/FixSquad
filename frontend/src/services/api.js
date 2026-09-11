@@ -99,6 +99,33 @@ export const updateBookingStatus = async (id, status) => {
     return response.data;
 };
 
+// PUT /api/admin/disputes/:id/resolve — override disputed booking status (admin only)
+// status: 'Completed' | 'Cancelled' | 'In-Progress'
+export const resolveDispute = async (id, status) => {
+  const response = await api.put(`/admin/disputes/${id}/resolve`, { status });
+  return response.data;
+};
+
+// ── Sprint 4: Customer Text Reviews — Rohan (Week4_Rohan_CONTRACT.md) ─────────
+
+// POST /api/reviews — submit a text review for a completed booking
+export const submitReview = async (bookingId, reviewText) => {
+  const response = await api.post('/reviews', { booking_id: bookingId, review_text: reviewText });
+  return response.data;
+};
+
+// GET /api/reviews/provider/:providerId — fetch all text reviews for a provider (public)
+export const fetchProviderReviews = async (providerId) => {
+  const response = await api.get(`/reviews/provider/${providerId}`);
+  return response.data;
+};
+
+// GET /api/reviews/my-reviews — fetch booking IDs the current customer has already reviewed
+export const fetchMyReviewedBookingIds = async () => {
+  const response = await api.get('/reviews/my-reviews');
+  return response.data; // { success: true, data: [bookingId, ...] }
+};
+
 export const fetchAvailability = async () => {
     const response = await api.get('/availability');
     return response.data;
@@ -113,3 +140,19 @@ export const removeAvailabilityBlock = async (id) => {
     const response = await api.delete(`/availability/${id}`);
     return response.data;
 };
+
+// ── Sprint 3: Admin Dispute Resolution — Naim (Week3_Naim_CONTRACT.md) ────────
+
+// GET /api/admin/disputes — fetch all Disputed bookings (admin only)
+export const fetchDisputedBookings = async () => {
+  const response = await api.get('/admin/disputes');
+  return response.data;
+};
+
+// PUT /api/admin/disputes/:id/resolve — override disputed booking status (admin only)
+// status: 'Completed' | 'Cancelled' | 'In-Progress'
+export const resolveDispute = async (id, status) => {
+  const response = await api.put(`/admin/disputes/${id}/resolve`, { status });
+  return response.data;
+};
+
