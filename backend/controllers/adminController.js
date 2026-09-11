@@ -129,3 +129,24 @@ exports.toggleUserSuspension = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error while updating suspension status.' });
   }
 };
+
+// GET /api/admin/users
+// Returns all users for the access control dashboard
+exports.getAllUsers = async (req, res) => {
+  try {
+    const sql = `
+      SELECT id, name, email, role, verification_status, is_suspended, created_at
+      FROM users
+      ORDER BY created_at DESC
+    `;
+    const [users] = await pool.query(sql);
+
+    return res.status(200).json({
+      success: true,
+      data: users
+    });
+  } catch (err) {
+    console.error('getAllUsers error:', err.message);
+    return res.status(500).json({ success: false, message: 'Server error while fetching users.' });
+  }
+};

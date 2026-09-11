@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Layers, CheckCircle2, XCircle, Link2 } from 'lucide-react';
 
 export default function StatsCards({ stats, totalLoaded }) {
@@ -7,7 +7,7 @@ export default function StatsCards({ stats, totalLoaded }) {
   const inactive = stats?.inactive_categories ?? 0;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center space-x-4">
         <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
           <Layers className="w-6 h-6" />
@@ -35,16 +35,6 @@ export default function StatsCards({ stats, totalLoaded }) {
         <div>
           <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Inactive Categories</p>
           <p className="text-2xl font-bold text-amber-400 mt-0.5">{inactive}</p>
-        </div>
-      </div>
-
-      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center space-x-4">
-        <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400">
-          <Link2 className="w-6 h-6" />
-        </div>
-        <div>
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">FK Target Key</p>
-          <p className="text-sm font-semibold text-purple-300 mt-1 font-mono">categories.id (INT)</p>
         </div>
       </div>
     </div>

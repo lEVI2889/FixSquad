@@ -67,11 +67,7 @@ function Navbar() {
                   </NavLink>
                 )}
 
-                {user?.role === 'admin' && (
-                  <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
-                    Categories
-                  </NavLink>
-                )}
+                
               </>
             )}
             {isAuthenticated && user?.role === 'provider' && (

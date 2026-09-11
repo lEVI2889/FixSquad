@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   getUnverifiedProviders,
   updateProviderVerification,
-  toggleUserSuspension
+  toggleUserSuspension,
+  getAllUsers
 } = require('../controllers/adminController');
 
 // NOTE: `protect` + `isAdmin` are applied at the server.js mount level.
@@ -22,3 +23,6 @@ router.put('/providers/:id/verify', updateProviderVerification);
 router.put('/users/:id/suspend', toggleUserSuspension);
 
 module.exports = router;
+
+// GET /api/admin/users - list all users for suspension management
+router.get('/users', getAllUsers);

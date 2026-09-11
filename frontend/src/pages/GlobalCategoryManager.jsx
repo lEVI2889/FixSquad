@@ -9,7 +9,6 @@ import CategoryCard from '../components/CategoryCard';
 import CategoryTable from '../components/CategoryTable';
 import CategoryFormModal from '../components/CategoryFormModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
-import ContractInspectorModal from '../components/ContractInspectorModal';
 
 export default function GlobalCategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -30,7 +29,6 @@ export default function GlobalCategoryManager() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [isContractOpen, setIsContractOpen] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -158,13 +156,7 @@ export default function GlobalCategoryManager() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 relative z-10">
-          <button
-            onClick={() => setIsContractOpen(true)}
-            className="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center space-x-2"
-          >
-            <Link2 className="w-4 h-4 text-indigo-400" />
-            <span>Contract Spec</span>
-          </button>
+          
 
           <button
             onClick={handleCreateNew}
@@ -330,10 +322,7 @@ export default function GlobalCategoryManager() {
         loading={deleteLoading}
       />
 
-      <ContractInspectorModal
-        isOpen={isContractOpen}
-        onClose={() => setIsContractOpen(false)}
-      />
+      
     </div>
   );
 }
