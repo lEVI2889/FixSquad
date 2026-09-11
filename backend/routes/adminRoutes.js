@@ -3,7 +3,10 @@ const router = express.Router();
 const {
   getUnverifiedProviders,
   updateProviderVerification,
-  toggleUserSuspension
+  toggleUserSuspension,
+  // Feature 13: Dispute Resolution Desk — Naim (Week3_Naim_CONTRACT.md)
+  getDisputedBookings,
+  resolveDispute
 } = require('../controllers/adminController');
 
 // NOTE: `protect` + `isAdmin` are applied at the server.js mount level.
@@ -21,4 +24,12 @@ router.put('/providers/:id/verify', updateProviderVerification);
 // PUT  /api/admin/users/:id/suspend  — suspend or reactivate any user account
 router.put('/users/:id/suspend', toggleUserSuspension);
 
+// ── Feature 13: Dispute Resolution Desk ────────────────────────────────────
+// GET  /api/admin/disputes           — list all bookings in 'Disputed' status
+router.get('/disputes', getDisputedBookings);
+
+// PUT  /api/admin/disputes/:id/resolve — forcefully override a disputed booking's status
+router.put('/disputes/:id/resolve', resolveDispute);
+
 module.exports = router;
+
