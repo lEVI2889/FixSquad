@@ -3,6 +3,7 @@ import {
     fetchPendingBookings, updateBookingStatus, 
     fetchAvailability, addAvailabilityBlock, removeAvailabilityBlock 
 } from '../services/api';
+import ProviderZoneManager from '../components/ProviderZoneManager';
 
 const ProviderOperations = () => {
     const [bookings, setBookings] = useState([]);
