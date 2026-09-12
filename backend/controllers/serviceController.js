@@ -114,7 +114,7 @@ const deleteService = async (req, res) => {
 
 const searchServices = async (req, res) => {
   try {
-    const { keyword, category_id, min_price, max_price, sort } = req.query;
+    const { keyword, category_id, min_price, max_price, sort, zone } = req.query;
 
     let sql = `
       SELECT 
@@ -136,6 +136,12 @@ const searchServices = async (req, res) => {
       WHERE 1=1
     `;
     const params = [];
+
+    // Dynamic zone filter
+    if (zone && zone.trim()) {
+      sql += ` AND s.provider_id IN (SELECT provider_id FROM provider_service_zones WHERE zone_name = ?)`;
+      params.push(zone.trim());
+    }
 
     // Dynamic keyword search across service name, description, and category name
     if (keyword && keyword.trim()) {

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchServices, fetchCategories } from '../services/api';
 import BookingModal from '../components/BookingModal';
 import { useAuth } from '../context/useAuth';
+import ZoneFilterSelect from '../components/ZoneFilterSelect';
 
 function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +15,7 @@ function ServicesPage() {
   const initialCategory = searchParams.get('category_id') || 'all';
 
   const [keyword, setKeyword] = useState(initialKeyword);
+  const [zone, setZone] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -47,6 +49,7 @@ function ServicesPage() {
     try {
       const params = {};
       if (keyword.trim()) params.keyword = keyword.trim();
+      if (zone.trim()) params.zone = zone.trim();
       if (selectedCategory && selectedCategory !== 'all') {
         params.category_id = selectedCategory;
       }
@@ -66,7 +69,7 @@ function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [keyword, selectedCategory, minPrice, maxPrice, sortBy]);
+  }, [keyword, selectedCategory, minPrice, maxPrice, sortBy, zone]);
 
   // Trigger search on filter changes
   useEffect(() => {
@@ -190,6 +193,10 @@ function ServicesPage() {
           </div>
 
           <div className="filters-right-group">
+            <div className="sort-filter-group">
+              <label className="filter-label">Zone:</label>
+              <ZoneFilterSelect value={zone} onChange={setZone} />
+            </div>
             {/* Price Filter Inputs */}
             <div className="price-filter-group">
               <span className="filter-label">Price (৳):</span>

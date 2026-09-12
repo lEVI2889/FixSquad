@@ -162,6 +162,9 @@ const ProviderOperations = () => {
                     </div>
                 </div>
             </section>
+            <section>
+                <ProviderZoneManager />
+            </section>
         </div>
     );
 };

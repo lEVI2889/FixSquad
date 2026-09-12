@@ -18,6 +18,8 @@ const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const zoneRoutes = require('./routes/zoneRoutes');
+
 const uploadRoutes = require('./routes/uploadRoutes');
 
 app.use(cors());
@@ -27,6 +29,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/zones', protect, zoneRoutes);
+
 app.use('/api/bookings', protect, bookingRoutes);
 app.use('/api/messages', protect, messageRoutes);
 app.use('/api/invoices', protect, invoiceRoutes);
