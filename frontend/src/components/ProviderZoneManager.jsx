@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchMyZones, addZone, deleteZone } from '../api/zoneApi';
+import { fetchMyZones, addZone, deleteZone } from '../services/zoneApi';
 
 export default function ProviderZoneManager() {
   const [zones, setZones] = useState([]);

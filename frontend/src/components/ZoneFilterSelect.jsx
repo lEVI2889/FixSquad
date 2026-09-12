@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchAllZones } from '../api/zoneApi';
+import { fetchAllZones } from '../services/zoneApi';
 
 // Drop this into the existing search page (Feature 1) so customers can
 // filter by zone. Calls onChange(zoneNameOrEmptyString) whenever the
