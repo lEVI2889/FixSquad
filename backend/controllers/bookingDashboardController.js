@@ -9,7 +9,7 @@ const pool = require('../config/db');
 const getCustomerBookings = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT b.id, b.customer_id, b.provider_id, b.service_id, b.status,
+      `SELECT b.id, b.quoted_price, b.quote_status, b.customer_id, b.provider_id, b.service_id, b.status,
               b.scheduled_date, b.scheduled_time, b.total_price,
               p.name AS provider_name, s.name AS service_name,
               b.created_at, b.updated_at
@@ -77,7 +77,7 @@ const getCustomerBookings = async (req, res) => {
 const getProviderBookings = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT b.id, b.customer_id, b.provider_id, b.service_id, b.status,
+      `SELECT b.id, b.quoted_price, b.quote_status, b.customer_id, b.provider_id, b.service_id, b.status,
               b.scheduled_date, b.scheduled_time, b.total_price,
               u.name AS customer_name, s.name AS service_name,
               b.created_at, b.updated_at

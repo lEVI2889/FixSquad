@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
     fetchPendingBookings, updateBookingStatus, 
-    fetchAvailability, addAvailabilityBlock, removeAvailabilityBlock 
+    fetchAvailability, addAvailabilityBlock, removeAvailabilityBlock, updateQuote 
 } from '../services/api';
 import ProviderZoneManager from '../components/ProviderZoneManager';
 
@@ -12,6 +12,7 @@ const ProviderOperations = () => {
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     
     const [blockForm, setBlockForm] = useState({ date: '', start_time: '', end_time: '' });
+    const [quoteForms, setQuoteForms] = useState({});
 
     useEffect(() => {
         loadBookings();
@@ -48,6 +49,17 @@ const ProviderOperations = () => {
             loadBookings(); // refresh list
         } catch (error) {
             console.error(`Failed to ${status} booking`, error);
+        }
+    };
+
+
+    const handleQuote = async (id, e) => {
+        e.preventDefault();
+        try {
+            await updateQuote(id, quoteForms[id]);
+            loadBookings();
+        } catch (error) {
+            console.error('Failed to submit quote', error);
         }
     };
 

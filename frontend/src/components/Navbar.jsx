@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import NotificationDropdown from './NotificationDropdown';
 import BrandMark from './BrandMark';
 
 const navLinkClass = ({ isActive }) =>

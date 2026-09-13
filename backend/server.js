@@ -19,6 +19,7 @@ const bookingDashboardRoutes = require('./routes/bookingDashboardRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const zoneRoutes = require('./routes/zoneRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const uploadRoutes = require('./routes/uploadRoutes');
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', protect, serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/zones', protect, zoneRoutes);
+app.use('/api/notifications', protect, notificationRoutes);
 
 app.use('/api/bookings', protect, bookingRoutes);
 app.use('/api/messages', protect, messageRoutes);

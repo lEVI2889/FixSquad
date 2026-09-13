@@ -8,6 +8,7 @@ import MessagingModal from '../components/MessagingModal';
 import RatingModal from '../components/RatingModal';
 import DisputeModal from '../components/DisputeModal';
 import { fetchCustomerBookings, cancelCustomerBooking } from '../services/bookingApi';
+import { respondToQuote } from '../services/api';
 
 const COLUMNS = ['Pending', 'Accepted', 'In-Progress', 'Completed'];
 
