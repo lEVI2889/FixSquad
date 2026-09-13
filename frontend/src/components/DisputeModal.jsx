@@ -45,49 +45,62 @@ export default function DisputeModal({ booking, onClose, onDisputeSubmitted }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-md w-full p-6 relative">
+    <div className="booking-modal-overlay" onClick={onClose}>
+      <div 
+        className="booking-modal" 
+        onClick={(e) => e.stopPropagation()} 
+        style={{ maxWidth: '480px' }}
+      >
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors"
+          className="modal-close-btn"
+          aria-label="Close modal"
         >
-          &times;
+          ✕
         </button>
 
-        <div className="flex items-center gap-2 mb-1 text-red-600">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <h2 className="text-xl font-bold text-slate-900">File a Dispute Ticket</h2>
+        <div className="modal-header">
+          <p className="eyebrow" style={{ marginBottom: '8px', color: '#c94c32' }}>
+            <span style={{ background: '#c94c32' }} /> Dispute & Escalation
+          </p>
+          <h2 style={{ margin: '0 0 8px' }}>File a Dispute Ticket</h2>
+          <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', margin: '0 0 20px' }}>
+            Opening resolution ticket for booking <strong style={{ color: 'var(--ink)' }}>#{booking.id}</strong> ({booking.service_name}).
+          </p>
         </div>
 
-        <p className="text-sm text-slate-500 mb-6">
-          Opening a dispute ticket for booking <span className="font-semibold text-slate-700">#{booking.id}</span> ({booking.service_name}).
-        </p>
-
         {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+          <div className="form-alert" role="alert">
             {error}
           </div>
         )}
 
         {successMsg && (
-          <div className="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg border border-green-100 font-medium">
-            {successMsg}
+          <div style={{
+            padding: '12px 16px',
+            background: '#eef8f3',
+            color: '#123f36',
+            border: '1px solid #bce6d4',
+            borderRadius: '10px',
+            fontWeight: 600,
+            fontSize: '0.88rem',
+            marginBottom: '16px'
+          }}>
+            ✓ {successMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label htmlFor="reason" className="block text-sm font-semibold text-slate-700 mb-1">
-              Primary Reason
+            <label htmlFor="reason" className="brand-label">
+              Primary Reason <span style={{ color: 'var(--coral)' }}>*</span>
             </label>
             <select
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-800 text-sm"
+              className="brand-select"
             >
               {DISPUTE_REASONS.map((r) => (
                 <option key={r} value={r}>
@@ -98,31 +111,44 @@ export default function DisputeModal({ booking, onClose, onDisputeSubmitted }) {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-semibold text-slate-700 mb-1">
-              Detailed Description <span className="text-red-500">*</span>
+            <label htmlFor="description" className="brand-label">
+              Detailed Description <span style={{ color: 'var(--coral)' }}>*</span>
             </label>
             <textarea
               id="description"
-              rows="4"
+              rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Explain clearly what went wrong so our resolution team can review..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-800 placeholder-slate-400 text-sm"
+              placeholder="Explain clearly what went wrong so our resolution team can review and take action..."
+              className="brand-textarea"
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '10px', borderTop: '1px solid var(--line)' }}>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors text-sm"
+              className="button button--ghost"
+              style={{ flex: 1 }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || successMsg}
-              className="flex-1 py-2.5 px-4 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 disabled:opacity-50 transition-colors text-sm shadow-sm"
+              style={{
+                flex: 1,
+                minHeight: '44px',
+                borderRadius: '12px',
+                background: '#c94c32',
+                color: 'white',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '0.88rem',
+                cursor: 'pointer',
+                transition: 'background .2s',
+                opacity: loading || successMsg ? 0.6 : 1
+              }}
             >
               {loading ? 'Submitting...' : 'Submit Ticket'}
             </button>

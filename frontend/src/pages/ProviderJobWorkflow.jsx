@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MessageSquare, Calendar, ClipboardList } from 'lucide-react';
 import MessagingModal from '../components/MessagingModal';
 import { fetchProviderBookings, updateBookingStatus } from '../services/bookingApi';
 
@@ -57,69 +58,197 @@ export default function ProviderJobWorkflow() {
     }
   };
 
-  if (loading) return <div className="container max-w-5xl mx-auto py-12 px-6 text-center text-gray-500">Loading your jobs...</div>;
+  if (loading) {
+    return (
+      <section className="dashboard-page">
+        <div className="container" style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <div className="spinner" />
+          <p style={{ color: 'var(--ink-soft)', fontWeight: 600, marginTop: '12px' }}>Loading active job workflows...</p>
+        </div>
+      </section>
+    );
+  }
+
+  const getBadgeClass = (status) => {
+    switch (status) {
+      case 'Pending': return 'badge badge--pending';
+      case 'Accepted': return 'badge badge--accepted';
+      case 'In-Progress': return 'badge badge--in-progress';
+      case 'Completed': return 'badge badge--completed';
+      case 'Cancelled': return 'badge badge--cancelled';
+      case 'Disputed': return 'badge badge--disputed';
+      case 'Rejected': return 'badge badge--rejected';
+      default: return 'badge badge--pending';
+    }
+  };
 
   return (
-    <main className="container max-w-5xl mx-auto py-12 px-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-indigo-700">Job Workflow</h1>
-      </div>
-      
-      {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>}
-
-      {bookings.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-48 text-gray-500 italic border-2 border-dashed border-gray-200 rounded-xl">
-              No bookings yet.
+    <section className="dashboard-page">
+      <div className="container" style={{ maxWidth: '1000px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', marginBottom: '32px' }}>
+          <div>
+            <p className="eyebrow"><span /> Execution & Stages</p>
+            <h1 style={{
+              fontFamily: 'Manrope, sans-serif',
+              fontSize: 'clamp(2rem, 3.5vw, 2.6rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              margin: '0 0 8px',
+              color: 'var(--ink)'
+            }}>
+              Job Workflow Controller
+            </h1>
+            <p style={{ color: 'var(--ink-soft)', margin: 0, fontSize: '0.98rem' }}>
+              Transition accepted jobs through active service stages and manage execution status in real-time.
+            </p>
           </div>
-      )}
+          <span className="badge badge--accepted" style={{ padding: '6px 14px', fontSize: '0.82rem' }}>
+            {bookings.length} Total Jobs
+          </span>
+        </div>
+        
+        {error && <div className="form-alert" role="alert" style={{ marginBottom: '24px' }}>{error}</div>}
 
-      <div className="space-y-6">
-        {bookings.map((booking) => {
-          const actions = ACTIONS_BY_STATUS[booking.status] || [];
-          return (
-            <div key={booking.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-md transition-shadow">
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="font-bold text-xl text-slate-900">{booking.service_name}</h2>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold uppercase tracking-wide">
-                    {booking.status}
-                  </span>
-                </div>
-                <div className="text-gray-600 mb-2">Customer: <span className="font-medium text-slate-900">{booking.customer_name}</span></div>
-                <div className="flex items-center text-sm text-gray-500 bg-gray-50 inline-flex p-2 rounded">
-                  <svg className="w-4 h-4 mr-2 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  {formatDate(booking.scheduled_date)} at {booking.scheduled_time}
-                </div>
-              </div>
-
-              <div className="flex gap-2 w-full mt-3">
-                {(booking.status === 'Accepted' || booking.status === 'In-Progress') && (
-                  <button onClick={() => setActiveMessageBookingId(booking.id)} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded text-sm font-semibold hover:bg-indigo-100 transition-colors">
-                    Message Customer
-                  </button>
-                )}
-              </div>
-              {actions.length > 0 && (
-                <div className="flex gap-3 md:flex-col lg:flex-row md:shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100">
-                  {actions.map((action) => (
-                    <button
-                      key={action.next}
-                      type="button"
-                      disabled={updatingId === booking.id}
-                      className="flex-1 lg:flex-none px-6 py-2.5 bg-indigo-700 text-white rounded-lg font-medium hover:bg-indigo-700/90 disabled:opacity-50 transition-colors"
-                      onClick={() => handleAction(booking.id, action.next)}
-                    >
-                      {updatingId === booking.id ? 'Updating...' : action.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+        {bookings.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 24px',
+            background: 'white',
+            borderRadius: '20px',
+            border: '1px solid var(--line)',
+            boxShadow: '0 4px 20px rgba(18, 63, 54, 0.04)'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '16px',
+              background: 'var(--mint-pale)',
+              display: 'grid',
+              placeItems: 'center',
+              margin: '0 auto 16px',
+              color: 'var(--forest)'
+            }}>
+              <ClipboardList size={30} aria-hidden="true" />
             </div>
-          );
-        })}
+            <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.3rem', fontWeight: 800, margin: '0 0 8px', color: 'var(--ink)' }}>
+              No Active Jobs
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '440px', margin: '0 auto', fontSize: '0.92rem' }}>
+              When you accept incoming customer booking requests, they will transition here to manage execution from Accepted to In-Progress and Completed.
+            </p>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {bookings.map((booking) => {
+            const actions = ACTIONS_BY_STATUS[booking.status] || [];
+            return (
+              <div 
+                key={booking.id} 
+                style={{
+                  background: 'white',
+                  border: '1px solid var(--line)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px',
+                  boxShadow: '0 2px 10px rgba(18, 63, 54, 0.03)',
+                  transition: 'border-color 0.2s, box-shadow 0.2s'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                      <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        {booking.service_name}
+                      </h2>
+                      <span className={getBadgeClass(booking.status)}>
+                        {booking.status}
+                      </span>
+                    </div>
+                    <div style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', marginBottom: '10px' }}>
+                      Customer: <strong style={{ color: 'var(--ink)' }}>{booking.customer_name}</strong>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: '#f4f8f6',
+                        color: 'var(--forest)',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.84rem',
+                        fontWeight: 600
+                      }}>
+                        <Calendar size={14} style={{ flexShrink: 0 }} aria-hidden="true" />
+                        {formatDate(booking.scheduled_date)} at {booking.scheduled_time}
+                      </span>
+                      {booking.total_price != null && (
+                        <span style={{
+                          background: 'var(--mint-pale)',
+                          color: 'var(--forest)',
+                          fontWeight: 800,
+                          fontSize: '0.86rem',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #bce6d4'
+                        }}>
+                          ৳{Number(booking.total_price).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions column */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
+                    {(booking.status === 'Accepted' || booking.status === 'In-Progress') && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveMessageBookingId(booking.id)}
+                        className="button button--ghost"
+                        style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        <MessageSquare size={14} aria-hidden="true" /> Message Customer
+                      </button>
+                    )}
+                    {actions.map((action) => {
+                      const isDestructive = action.next === 'Rejected' || action.next === 'Cancelled' || action.next === 'Disputed';
+                      return (
+                        <button
+                          key={action.next}
+                          type="button"
+                          disabled={updatingId === booking.id}
+                          className={isDestructive ? 'button' : 'button button--primary'}
+                          style={isDestructive ? {
+                            padding: '8px 16px',
+                            fontSize: '0.85rem',
+                            background: '#fff1ed',
+                            color: '#c94c32',
+                            border: '1px solid #f0bbae',
+                            borderRadius: '10px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          } : {
+                            padding: '8px 18px',
+                            fontSize: '0.85rem'
+                          }}
+                          onClick={() => handleAction(booking.id, action.next)}
+                        >
+                          {updatingId === booking.id ? 'Updating...' : action.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {activeMessageBookingId && <MessagingModal bookingId={activeMessageBookingId} onClose={() => setActiveMessageBookingId(null)} />}
       </div>
-      {activeMessageBookingId && <MessagingModal bookingId={activeMessageBookingId} onClose={() => setActiveMessageBookingId(null)} />}
-    </main>
+    </section>
   );
 }

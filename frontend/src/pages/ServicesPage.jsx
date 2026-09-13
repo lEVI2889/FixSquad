@@ -1,9 +1,30 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { 
+  Sparkles, Wrench, Zap, Hammer, Palette, Cpu, Shield, 
+  Scissors, Folder, Star, ArrowUpRight 
+} from 'lucide-react';
 import { searchServices, fetchCategories } from '../services/api';
 import BookingModal from '../components/BookingModal';
 import { useAuth } from '../context/useAuth';
 import ZoneFilterSelect from '../components/ZoneFilterSelect';
+
+const iconMap = {
+  sparkles: Sparkles,
+  wrench: Wrench,
+  zap: Zap,
+  hammer: Hammer,
+  palette: Palette,
+  cpu: Cpu,
+  shield: Shield,
+  scissors: Scissors,
+  folder: Folder
+};
+
+function getCategoryIcon(iconName) {
+  const IconComp = (iconName && iconMap[iconName.toLowerCase()]) || Folder;
+  return <IconComp size={13} className="catalog-cat-badge__icon" aria-hidden="true" />;
+}
 
 function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -194,7 +215,7 @@ function ServicesPage() {
 
           <div className="filters-right-group">
             <div className="sort-filter-group">
-              <label className="filter-label">Zone:</label>
+              <label htmlFor="service-zone-select" className="filter-label">Zone:</label>
               <ZoneFilterSelect value={zone} onChange={setZone} />
             </div>
             {/* Price Filter Inputs */}
@@ -274,17 +295,17 @@ function ServicesPage() {
               <article key={service.id} className="catalog-card">
                 <div className="catalog-card__header">
                   <span className="catalog-cat-badge">
-                    <i>{service.category_icon || '🛠'}</i>
-                    {service.category_name || 'General Service'}
+                    {getCategoryIcon(service.category_icon)}
+                    <span className="catalog-cat-badge__text">{service.category_name || 'General Service'}</span>
                   </span>
                   <div className="catalog-rating">
-                    ★ {Number(service.provider_rating || 4.8).toFixed(1)}
+                    <Star size={12} fill="#d97706" color="#d97706" aria-hidden="true" />
+                    <span>{Number(service.provider_rating || 4.8).toFixed(1)}</span>
                     <small>({service.total_reviews || 12})</small>
                   </div>
                 </div>
 
                 <h3 className="catalog-card__title">{service.name}</h3>
-                {/* Description removed for cleaner UI */}
 
                 <div className="catalog-provider-info">
                   <div className="provider-avatar">
@@ -296,9 +317,20 @@ function ServicesPage() {
                   </div>
                   <div className="provider-meta">
                     <span className="provider-label">Provider</span>
-                    <strong className="provider-name">
-                      {service.provider_name || 'Verified Professional'}
-                    </strong>
+                    {service.provider_id ? (
+                      <Link
+                        to={`/provider/${service.provider_id}/profile`}
+                        className="provider-name"
+                        title="View provider profile and reviews"
+                      >
+                        <span>{service.provider_name || 'Verified Professional'}</span>
+                        <ArrowUpRight size={13} aria-hidden="true" />
+                      </Link>
+                    ) : (
+                      <strong className="provider-name">
+                        {service.provider_name || 'Verified Professional'}
+                      </strong>
+                    )}
                   </div>
                 </div>
 
@@ -312,7 +344,7 @@ function ServicesPage() {
                     type="button"
                     onClick={() => handleBookNow(service)}
                   >
-                    Book Now <span>⚡</span>
+                    Book Now <Zap size={13} fill="currentColor" aria-hidden="true" />
                   </button>
                 </div>
               </article>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Search, Filter, LayoutGrid, List, RefreshCw, 
   AlertCircle, CheckCircle2, Link2, Sparkles, FolderPlus
@@ -126,182 +126,256 @@ export default function GlobalCategoryManager() {
   }, [categories, search, statusFilter, sortBy]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center space-x-2 px-4 py-3 rounded-xl border shadow-xl animate-in slide-in-from-bottom-4 duration-200 ${
-          toast.type === 'error' 
-            ? 'bg-rose-950/90 text-rose-200 border-rose-800' 
-            : 'bg-emerald-950/90 text-emerald-200 border-emerald-800'
-        }`}>
-          {toast.type === 'error' ? <AlertCircle className="w-5 h-5 text-rose-400" /> : <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-          <span className="text-sm font-medium">{toast.message}</span>
-        </div>
-      )}
-
-      {/* Hero / Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-900/50 border border-indigo-500/20 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="relative z-10">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-semibold mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Core Foundation Architecture • Feature 12</span>
+    <section className="dashboard-page">
+      <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+        {/* Toast Notification */}
+        {toast && (
+          <div style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 100,
+            padding: '14px 20px',
+            borderRadius: '12px',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            background: toast.type === 'error' ? '#fff1ed' : '#dff6ea',
+            color: toast.type === 'error' ? '#9c3a27' : '#123f36',
+            border: `1px solid ${toast.type === 'error' ? '#f0bbae' : '#a7d9c5'}`,
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            {toast.type === 'error' ? <AlertCircle className="w-5 h-5 text-rose-600" /> : <CheckCircle2 className="w-5 h-5 text-emerald-700" />}
+            <span>{toast.message}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Global Service Category Manager
-          </h2>
-          <p className="text-slate-400 text-sm mt-2 max-w-2xl leading-relaxed">
-            Manage global service categories using raw SQL queries with zero ORMs. 
-            All records maintain strict foreign key compatibility for Rohan's <code className="text-indigo-300 bg-indigo-950/60 px-1.5 py-0.5 rounded font-mono text-xs">services.category_id</code> reference.
-          </p>
-        </div>
+        )}
 
-        <div className="flex flex-wrap items-center gap-3 relative z-10">
-          
+        {/* Hero / Header Banner */}
+        <div style={{
+          background: 'var(--forest)',
+          color: 'white',
+          borderRadius: '20px',
+          padding: '36px 32px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          boxShadow: '0 10px 30px rgba(18, 63, 54, 0.15)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ maxWidth: '680px' }}>
+              <p className="eyebrow eyebrow--light" style={{ marginBottom: '10px' }}>
+                <span /> Platform Foundation & Categories
+              </p>
+              <h1 style={{
+                fontFamily: 'Manrope, sans-serif',
+                fontSize: 'clamp(2rem, 3.6vw, 2.7rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.04em',
+                margin: '0 0 10px',
+                color: 'white',
+                lineHeight: 1.15
+              }}>
+                Global Service Category Manager
+              </h1>
+              <p style={{ color: '#c0d3cd', margin: 0, fontSize: '0.96rem', lineHeight: 1.6 }}>
+                Dynamically manage system-wide service categories. Configure category definitions, icons, and visibility to structure household offerings for providers and customers.
+              </p>
+            </div>
 
-          <button
-            onClick={handleCreateNew}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-indigo-600/30 flex items-center space-x-2 group"
-          >
-            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-            <span>Add Category</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Aggregate Statistics */}
-      <StatsCards stats={stats} totalLoaded={categories.length} />
-
-      {/* Search, Filter, and Controls Bar */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Search Box */}
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search categories by name or description..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-sm text-white placeholder-slate-500 outline-none transition-all"
-          />
-        </div>
-
-        {/* Filters and View Controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Status Filter */}
-          <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-slate-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-950 border border-slate-800 text-slate-200 text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active Only</option>
-              <option value="inactive">Inactive Only</option>
-            </select>
-          </div>
-
-          {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-slate-200 text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500"
-          >
-            <option value="id">Sort by ID (Ascending)</option>
-            <option value="name">Sort by Name (A-Z)</option>
-            <option value="newest">Sort by Newest</option>
-          </select>
-
-          {/* View Mode Toggle */}
-          <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1">
             <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Grid View"
+              type="button"
+              onClick={handleCreateNew}
+              className="button button--light"
+              style={{ minHeight: '44px', fontWeight: 800 }}
             >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === 'table' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Table View"
-            >
-              <List className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
+              <span>+ Add Category</span>
             </button>
           </div>
+        </div>
 
-          {/* Refresh Button */}
-          <button
-            onClick={loadData}
-            disabled={loading}
-            className="p-2 bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 rounded-xl transition-colors disabled:opacity-50"
-            title="Refresh list"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-indigo-400' : ''}`} />
-          </button>
-        </div>
-      </div>
+        {/* Aggregate Statistics */}
+        <StatsCards stats={stats} totalLoaded={categories.length} />
 
-      {/* Error Banner */}
-      {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center space-x-3 text-rose-400 text-sm">
-          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="font-semibold">Backend Connection Notice</p>
-            <p className="text-xs text-rose-300/80 mt-0.5">{error}</p>
-          </div>
-          <button
-            onClick={loadData}
-            className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 rounded-lg text-xs font-semibold transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
-      {/* Category List Render */}
-      {loading && categories.length === 0 ? (
-        <div className="py-16 text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-indigo-500 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">Executing raw SQL query to load categories...</p>
-        </div>
-      ) : filteredCategories.length === 0 ? (
-        <div className="py-16 text-center bg-slate-900/40 border border-slate-800 rounded-2xl p-8">
-          <FolderPlus className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-white">No categories found</h3>
-          <p className="text-slate-400 text-sm mt-1 max-w-sm mx-auto">
-            {search ? `No categories match your search "${search}".` : 'Get started by creating your first service category.'}
-          </p>
-          <button
-            onClick={handleCreateNew}
-            className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors inline-flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Category</span>
-          </button>
-        </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filteredCategories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              category={category}
-              onEdit={handleEdit}
-              onDelete={handleDeletePrompt}
+        {/* Search, Filter, and Controls Bar */}
+        <div style={{
+          background: 'white',
+          border: '1px solid var(--line)',
+          borderRadius: '16px',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+          boxShadow: '0 2px 10px rgba(18, 63, 54, 0.03)'
+        }}>
+          {/* Search Box */}
+          <div style={{ position: 'relative', flex: '1 1 280px', minWidth: '240px' }}>
+            <Search style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-soft)' }} className="w-4 h-4" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search categories by name or description..."
+              className="brand-input"
+              style={{ paddingLeft: '40px' }}
             />
-          ))}
+          </div>
+
+          {/* Filters and View Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            {/* Status Filter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Filter className="w-4 h-4 text-slate-400" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="brand-select"
+                style={{ width: 'auto', minWidth: '130px', height: '40px', fontSize: '0.85rem' }}
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+              </select>
+            </div>
+
+            {/* Sort By */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="brand-select"
+              style={{ width: 'auto', minWidth: '160px', height: '40px', fontSize: '0.85rem' }}
+            >
+              <option value="id">Sort by ID (Ascending)</option>
+              <option value="name">Sort by Name (A-Z)</option>
+              <option value="newest">Sort by Newest</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', background: '#f4f6f4', border: '1px solid var(--line)', borderRadius: '10px', padding: '3px' }}>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  background: viewMode === 'grid' ? 'white' : 'transparent',
+                  color: viewMode === 'grid' ? 'var(--forest)' : 'var(--ink-soft)',
+                  boxShadow: viewMode === 'grid' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                  cursor: 'pointer',
+                  display: 'grid',
+                  placeItems: 'center'
+                }}
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  background: viewMode === 'table' ? 'white' : 'transparent',
+                  color: viewMode === 'table' ? 'var(--forest)' : 'var(--ink-soft)',
+                  boxShadow: viewMode === 'table' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                  cursor: 'pointer',
+                  display: 'grid',
+                  placeItems: 'center'
+                }}
+                title="Table View"
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Refresh Button */}
+            <button
+              type="button"
+              onClick={loadData}
+              disabled={loading}
+              className="button button--ghost"
+              style={{ minHeight: '40px', padding: '0 12px' }}
+              title="Refresh list"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
-      ) : (
-        <CategoryTable
-          categories={filteredCategories}
-          onEdit={handleEdit}
-          onDelete={handleDeletePrompt}
-        />
-      )}
+
+        {/* Error Banner */}
+        {error && (
+          <div className="form-alert" role="alert" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <strong>Backend Connection Notice:</strong> {error}
+            </div>
+            <button
+              type="button"
+              onClick={loadData}
+              className="button button--ghost button--small"
+              style={{ border: '1px solid #f0bbae', background: 'white' }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Category List Render */}
+        {loading && categories.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div className="spinner" />
+            <p style={{ color: 'var(--ink-soft)', fontWeight: 600 }}>Loading category catalog...</p>
+          </div>
+        ) : filteredCategories.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 24px',
+            background: 'white',
+            borderRadius: '20px',
+            border: '1px solid var(--line)',
+            boxShadow: '0 4px 20px rgba(18, 63, 54, 0.04)'
+          }}>
+            <FolderPlus className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+            <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.3rem', fontWeight: 800, margin: '0 0 8px', color: 'var(--ink)' }}>
+              No Categories Found
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '420px', margin: '0 auto 20px', fontSize: '0.92rem' }}>
+              {search ? `No categories match your search "${search}".` : 'Get started by creating your first service category.'}
+            </p>
+            <button
+              type="button"
+              onClick={handleCreateNew}
+              className="button button--primary"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Category</span>
+            </button>
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+            {filteredCategories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                onEdit={handleEdit}
+                onDelete={handleDeletePrompt}
+              />
+            ))}
+          </div>
+        ) : (
+          <CategoryTable
+            categories={filteredCategories}
+            onEdit={handleEdit}
+            onDelete={handleDeletePrompt}
+          />
+        )}
 
       {/* Modals */}
       <CategoryFormModal
@@ -322,7 +396,7 @@ export default function GlobalCategoryManager() {
         loading={deleteLoading}
       />
 
-      
-    </div>
+      </div>
+    </section>
   );
 }

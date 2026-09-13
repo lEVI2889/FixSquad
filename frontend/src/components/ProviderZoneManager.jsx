@@ -48,40 +48,54 @@ export default function ProviderZoneManager() {
     }
   };
 
-  if (loading) return <div className="dashboard-status">Loading your service zones...</div>;
+  if (loading) {
+    return (
+      <div className="provider-zone-manager" style={{ textAlign: 'center', padding: '36px 20px' }}>
+        <div className="spinner" style={{ width: '30px', height: '30px' }} />
+        <p style={{ color: 'var(--ink-soft)', margin: '10px 0 0', fontSize: '0.88rem' }}>Loading your service zones...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="provider-zone-manager">
-      <h1>Service Zones</h1>
-      <p>Add the neighborhoods or city zones where you're available to work.</p>
+      <h2>Service Coverage Zones</h2>
+      <p>Add specific neighborhoods, upazilas, or city regions where you are available to accept jobs.</p>
 
-      {error && <div className="dashboard-status dashboard-status--error">{error}</div>}
+      {error && <div className="form-alert" role="alert" style={{ marginBottom: '16px' }}>{error}</div>}
 
       <form onSubmit={handleAdd} className="zone-form">
         <input
           type="text"
           value={zoneInput}
           onChange={(e) => setZoneInput(e.target.value)}
-          placeholder="e.g. Gulshan, Banani, Dhanmondi"
+          placeholder="e.g. Gulshan, Banani, Dhanmondi, Mirpur"
           disabled={submitting}
         />
         <button type="submit" disabled={submitting || !zoneInput.trim()}>
-          {submitting ? 'Adding...' : 'Add Zone'}
+          {submitting ? 'Adding...' : '+ Add Zone'}
         </button>
       </form>
 
-      {zones.length === 0 && <p className="zone-list__empty">No zones added yet.</p>}
-
-      <ul className="zone-list">
-        {zones.map((zone) => (
-          <li key={zone.id} className="zone-list__item">
-            <span>{zone.zone_name}</span>
-            <button type="button" onClick={() => handleDelete(zone.id)} aria-label={`Remove ${zone.zone_name}`}>
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
+      {zones.length === 0 ? (
+        <p className="zone-list__empty">No specific zones added yet. You are currently visible across all service regions.</p>
+      ) : (
+        <ul className="zone-list">
+          {zones.map((zone) => (
+            <li key={zone.id} className="zone-list__item">
+              <span>📍 {zone.zone_name}</span>
+              <button 
+                type="button" 
+                onClick={() => handleDelete(zone.id)} 
+                aria-label={`Remove ${zone.zone_name}`}
+                title={`Remove ${zone.zone_name}`}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

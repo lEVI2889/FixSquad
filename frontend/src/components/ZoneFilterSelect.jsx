@@ -19,6 +19,8 @@ export default function ZoneFilterSelect({ value, onChange }) {
 
   return (
     <select
+      id="service-zone-select"
+      aria-label="Filter by service zone"
       className="zone-filter-select"
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}

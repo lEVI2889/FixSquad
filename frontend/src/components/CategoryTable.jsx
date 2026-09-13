@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   Sparkles, Wrench, Zap, Hammer, Palette, Cpu, Shield, 
   Scissors, Folder, Edit3, Trash2, Calendar
@@ -18,19 +18,19 @@ const iconMap = {
 
 export default function CategoryTable({ categories, onEdit, onDelete }) {
   return (
-    <div className="overflow-x-auto bg-slate-900 border border-slate-800 rounded-xl">
-      <table className="w-full text-left text-sm text-slate-300">
-        <thead className="bg-slate-950/60 text-xs uppercase font-semibold text-slate-400 border-b border-slate-800">
+    <div className="brand-table-wrap">
+      <table className="brand-table">
+        <thead>
           <tr>
-            <th scope="col" className="px-6 py-4">ID (FK Key)</th>
-            <th scope="col" className="px-6 py-4">Category Name</th>
-            <th scope="col" className="px-6 py-4">Description</th>
-            <th scope="col" className="px-6 py-4">Status</th>
-            <th scope="col" className="px-6 py-4">Created</th>
-            <th scope="col" className="px-6 py-4 text-right">Actions</th>
+            <th style={{ width: '80px' }}>ID</th>
+            <th>Category Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created Date</th>
+            <th style={{ textAlign: 'right' }}>Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800">
+        <tbody>
           {categories.map((cat) => {
             const IconComponent = iconMap[cat.icon] || Folder;
             const isActive = Boolean(cat.is_active);
@@ -39,48 +39,93 @@ export default function CategoryTable({ categories, onEdit, onDelete }) {
               : '-';
 
             return (
-              <tr key={cat.id} className="hover:bg-slate-800/40 transition-colors">
-                <td className="px-6 py-4 font-mono font-bold text-indigo-400">
-                  #{cat.id}
+              <tr key={cat.id}>
+                <td>
+                  <span style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.8rem',
+                    color: 'var(--forest)',
+                    fontWeight: 800,
+                    background: '#f4f8f6',
+                    padding: '2px 8px',
+                    borderRadius: '6px'
+                  }}>
+                    #{cat.id}
+                  </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: 'var(--mint-pale)',
+                      color: 'var(--forest)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0
+                    }}>
                       <IconComponent className="w-4 h-4" />
                     </div>
-                    <span className="font-semibold text-white">{cat.name}</span>
+                    <strong style={{ color: 'var(--ink)', fontSize: '0.92rem' }}>{cat.name}</strong>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-400 max-w-xs truncate">
+                <td style={{ color: 'var(--ink-soft)', maxWidth: '280px', fontSize: '0.85rem' }}>
                   {cat.description || '-'}
                 </td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full border ${
-                    isActive 
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
-                      : 'bg-slate-800 text-slate-400 border-slate-700'
-                  }`}>
+                <td>
+                  <span className={isActive ? 'badge badge--completed' : 'badge badge--rejected'}>
                     {isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-slate-500 text-xs">
+                <td style={{ color: 'var(--ink-soft)', fontSize: '0.82rem' }}>
                   {formattedDate}
                 </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end space-x-2">
+                <td style={{ textAlign: 'right' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
                     <button
+                      type="button"
                       onClick={() => onEdit(cat)}
-                      className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                      style={{
+                        padding: '6px 12px',
+                        border: '1px solid var(--line)',
+                        borderRadius: '8px',
+                        background: '#fafaf7',
+                        color: 'var(--forest)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        transition: 'background .2s'
+                      }}
                       title="Edit Category"
                     >
-                      <Edit3 className="w-4 h-4" />
+                      <Edit3 className="w-3.5 h-3.5" />
+                      Edit
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDelete(cat)}
-                      className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                      style={{
+                        padding: '6px 12px',
+                        border: '1px solid #f0bbae',
+                        borderRadius: '8px',
+                        background: '#fff1ed',
+                        color: '#c94c32',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        transition: 'background .2s'
+                      }}
                       title="Delete Category"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Delete
                     </button>
                   </div>
                 </td>

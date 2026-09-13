@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Wrench, Zap, Hammer, Palette, Cpu, Shield, Scissors, Folder, Check } from 'lucide-react';
 
 const icons = [
@@ -63,48 +63,59 @@ export default function CategoryFormModal({ isOpen, onClose, onSave, category })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/40">
-          <div>
-            <h2 className="text-lg font-bold text-white">
-              {category ? `Edit Category #${category.id}` : 'Create New Category'}
-            </h2>
-            <p className="text-xs text-slate-400">
-              {category ? 'Update category details and availability' : 'Add a global category for provider services'}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <div className="booking-modal-overlay" onClick={onClose}>
+      <div 
+        className="booking-modal" 
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '540px' }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="modal-close-btn"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+
+        <div className="modal-header">
+          <p className="eyebrow" style={{ marginBottom: '8px' }}>
+            <span /> {category ? 'Platform Structure' : 'Global Categories'}
+          </p>
+          <h2 style={{ margin: '0 0 8px' }}>
+            {category ? `Edit Category #${category.id}` : 'Create New Category'}
+          </h2>
+          <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', margin: '0 0 20px' }}>
+            {category 
+              ? 'Update category name, icon, description, and provider visibility.' 
+              : 'Add a new household service category for providers to list offerings under.'
+            }
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs font-medium">
+            <div className="form-alert" role="alert">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Category Name <span className="text-rose-400">*</span>
+            <label className="brand-label">
+              Category Name <span style={{ color: 'var(--coral)' }}>*</span>
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Home Cleaning, Solar Installation..."
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-sm text-white placeholder-slate-500 outline-none transition-all"
+              placeholder="e.g. Appliance Repair, Home Cleaning..."
+              className="brand-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="brand-label">
               Description
             </label>
             <textarea
@@ -112,15 +123,15 @@ export default function CategoryFormModal({ isOpen, onClose, onSave, category })
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the services offered under this category..."
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-sm text-white placeholder-slate-500 outline-none transition-all resize-none"
+              className="brand-textarea"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+            <label className="brand-label" style={{ marginBottom: '8px' }}>
               Category Icon
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '8px' }}>
               {icons.map(({ id, Icon }) => {
                 const isSelected = icon === id;
                 return (
@@ -128,56 +139,61 @@ export default function CategoryFormModal({ isOpen, onClose, onSave, category })
                     key={id}
                     type="button"
                     onClick={() => setIcon(id)}
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
-                      isSelected
-                        ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 ring-1 ring-indigo-500/50'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
-                    }`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '10px 6px',
+                      borderRadius: '12px',
+                      border: isSelected ? '2px solid var(--forest)' : '1px solid var(--line)',
+                      background: isSelected ? 'var(--mint-pale)' : '#fdfdfc',
+                      color: isSelected ? 'var(--forest)' : 'var(--ink-soft)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="text-[10px] mt-1 truncate capitalize">{id}</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '4px', textTransform: 'capitalize' }}>
+                      {id}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <div className="pt-2">
-            <label className="flex items-center space-x-3 cursor-pointer">
+          <div style={{ paddingTop: '4px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-950 border-slate-700"
+                style={{ width: '18px', height: '18px', accentColor: 'var(--forest)' }}
               />
               <div>
-                <span className="text-sm font-medium text-slate-200">Active Status</span>
-                <p className="text-xs text-slate-500">Allow providers to select this category when creating services</p>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--ink)' }}>Active Status</span>
+                <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--ink-soft)' }}>
+                  Allow providers to select this category when creating services
+                </p>
               </div>
             </label>
           </div>
 
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-800">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--line)' }}>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-xl transition-colors"
+              className="button button--ghost"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-xl transition-all shadow-lg shadow-indigo-600/25 flex items-center space-x-1.5"
+              className="button button--primary"
             >
-              {loading ? (
-                <span>Saving...</span>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>{category ? 'Update Category' : 'Create Category'}</span>
-                </>
-              )}
+              {loading ? 'Saving...' : (category ? 'Update Category' : 'Create Category')}
             </button>
           </div>
         </form>

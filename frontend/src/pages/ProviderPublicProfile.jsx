@@ -14,31 +14,77 @@ function formatDate(dateStr) {
 }
 
 function ReviewCard({ review }) {
+  const rating = Number(review.rating) || 5;
+  const commentText = review.comment || review.review_text || 'No written feedback provided.';
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
+    <div style={{
+      background: 'white',
+      border: '1px solid var(--line)',
+      borderRadius: '16px',
+      padding: '20px 24px',
+      boxShadow: '0 2px 8px rgba(18, 63, 54, 0.03)',
+      transition: 'border-color 0.2s, box-shadow 0.2s'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
         <div>
-          <p className="font-semibold text-slate-800">{review.customer_name}</p>
-          <p className="text-xs text-gray-400 mt-0.5">for: {review.service_name}</p>
+          <h4 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.05rem', fontWeight: 800, margin: '0 0 2px', color: 'var(--ink)' }}>
+            {review.customer_name}
+          </h4>
+          <span style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
+            for service: <strong style={{ color: 'var(--forest)' }}>{review.service_name || 'Household Service'}</strong>
+          </span>
         </div>
-        <span className="text-xs text-gray-400 whitespace-nowrap ml-4">{formatDate(review.created_at)}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+          <div style={{ color: '#f59e0b', fontSize: '1rem', letterSpacing: '2px' }}>
+            {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+          </div>
+          <span style={{ fontSize: '0.78rem', color: '#8c9c97' }}>
+            {formatDate(review.created_at)}
+          </span>
+        </div>
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed">{review.review_text}</p>
+      <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--ink)', lineHeight: 1.6 }}>
+        "{commentText}"
+      </p>
     </div>
   );
 }
 
 function ServiceCard({ service }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex justify-between items-center">
-      <div>
-        <p className="font-semibold text-slate-800">{service.name}</p>
+    <div style={{
+      background: 'white',
+      border: '1px solid var(--line)',
+      borderRadius: '16px',
+      padding: '20px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: '16px',
+      boxShadow: '0 2px 8px rgba(18, 63, 54, 0.03)'
+    }}>
+      <div style={{ flex: 1 }}>
+        <h4 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.05rem', fontWeight: 800, margin: '0 0 4px', color: 'var(--ink)' }}>
+          {service.name}
+        </h4>
         {service.description && (
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{service.description}</p>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--ink-soft)', lineHeight: 1.5 }}>
+            {service.description}
+          </p>
         )}
       </div>
-      <span className="ml-4 text-indigo-700 font-bold text-sm whitespace-nowrap">
-        ${Number(service.base_price).toFixed(2)}
+      <span style={{
+        background: 'var(--mint-pale)',
+        color: 'var(--forest)',
+        fontWeight: 800,
+        fontSize: '0.95rem',
+        padding: '6px 14px',
+        borderRadius: '10px',
+        border: '1px solid #bce6d4',
+        whiteSpace: 'nowrap'
+      }}>
+        ৳{Number(service.base_price).toFixed(2)}
       </span>
     </div>
   );
@@ -59,22 +105,21 @@ export default function ProviderPublicProfile() {
 
     const loadProfile = async () => {
       try {
-        // Fetch reviews (public) and provider's published services in parallel
         const [reviewsRes, servicesRes] = await Promise.all([
           fetchProviderReviews(providerId),
-          // Services endpoint is protected, but we attempt a public variant via search
           api.get(`/services/search?provider_id=${providerId}`).catch(() => ({ data: { data: [] } }))
         ]);
 
         if (!cancelled) {
           const reviewData = reviewsRes.data || [];
+          const serviceData = servicesRes.data?.data || [];
           setReviews(reviewData);
-          setServices(servicesRes.data?.data || []);
+          setServices(serviceData);
 
-          // Derive provider name from reviews if available
-          if (reviewData.length > 0) {
-            // Reviews don't carry provider name but bookings→services join can give service_name
-            // Provider name fetched separately for display
+          if (serviceData.length > 0 && serviceData[0].provider_name) {
+            setProviderName(serviceData[0].provider_name);
+          } else if (reviewData.length > 0 && reviewData[0].provider_name) {
+            setProviderName(reviewData[0].provider_name);
           }
         }
       } catch (err) {
@@ -90,86 +135,161 @@ export default function ProviderPublicProfile() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl mx-auto py-16 px-6 text-center text-gray-500">
-        Loading provider profile…
-      </div>
+      <section className="dashboard-page">
+        <div className="container" style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <div className="spinner" />
+          <p style={{ color: 'var(--ink-soft)', fontWeight: 600, marginTop: '12px' }}>Loading verified provider profile…</p>
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="container max-w-4xl mx-auto py-16 px-6 text-center text-red-600 bg-red-50 rounded-lg">
-        {error}
-      </div>
+      <section className="dashboard-page">
+        <div className="container" style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div className="form-alert" role="alert">{error}</div>
+          <Link to="/services" className="button button--ghost" style={{ marginTop: '16px', display: 'inline-block' }}>
+            ← Back to Services
+          </Link>
+        </div>
+      </section>
     );
   }
 
-  return (
-    <main className="container max-w-4xl mx-auto py-12 px-6">
-      {/* Back navigation */}
-      <Link
-        to="/services"
-        className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 mb-6 font-medium"
-      >
-        ← Back to Services
-      </Link>
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0) / reviews.length).toFixed(1)
+    : null;
 
-      {/* Provider header */}
-      <div className="bg-gradient-to-r from-indigo-50 to-white rounded-2xl border border-indigo-100 p-8 mb-8 shadow-sm">
-        <div className="flex items-center gap-4">
-          {/* Avatar placeholder */}
-          <div className="w-16 h-16 rounded-full bg-indigo-200 flex items-center justify-center text-2xl font-bold text-indigo-700 shrink-0">
-            {providerName ? providerName[0].toUpperCase() : '#'}
+  return (
+    <section className="dashboard-page">
+      <div className="container" style={{ maxWidth: '960px' }}>
+        {/* Back navigation */}
+        <Link
+          to="/services"
+          className="button button--ghost button--small"
+          style={{ marginBottom: '24px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+        >
+          ← Back to Catalog
+        </Link>
+
+        {/* Provider header banner */}
+        <div style={{
+          background: 'white',
+          border: '1px solid var(--line)',
+          borderRadius: '20px',
+          padding: '32px',
+          marginBottom: '36px',
+          boxShadow: '0 4px 20px rgba(18, 63, 54, 0.04)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '24px',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{
+            width: '72px',
+            height: '72px',
+            borderRadius: '50%',
+            background: 'var(--mint-pale)',
+            color: 'var(--forest)',
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: '1.8rem',
+            fontWeight: 800,
+            flexShrink: 0
+          }}>
+            {providerName ? providerName[0].toUpperCase() : 'P'}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              {providerName || `Provider #${providerId}`}
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              {reviews.length} customer review{reviews.length !== 1 ? 's' : ''}
-              {services.length > 0 && ` · ${services.length} service${services.length !== 1 ? 's' : ''}`}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
+              <h1 style={{
+                fontFamily: 'Manrope, sans-serif',
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                fontWeight: 800,
+                color: 'var(--ink)',
+                margin: 0
+              }}>
+                {providerName || `Service Provider #${providerId}`}
+              </h1>
+              <span className="badge badge--accepted" style={{ fontSize: '0.78rem' }}>
+                Verified Provider
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', color: 'var(--ink-soft)', fontSize: '0.9rem' }}>
+              {avgRating && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 700, color: 'var(--ink)' }}>
+                  <span style={{ color: '#f59e0b' }}>★</span> {avgRating} Rating
+                </span>
+              )}
+              <span>{reviews.length} Verified Review{reviews.length !== 1 ? 's' : ''}</span>
+              {services.length > 0 && <span>{services.length} Published Service{services.length !== 1 ? 's' : ''}</span>}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Services section */}
-      {services.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-gray-200">
-            Services Offered
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {services.map((svc) => (
-              <ServiceCard key={svc.id} service={svc} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Reviews section */}
-      <section>
-        <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-gray-200">
-          Customer Reviews
-        </h2>
-
-        {reviews.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
-            <svg className="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            <p className="font-semibold">No reviews yet</p>
-            <p className="text-sm mt-1">Be the first to leave feedback after your job is completed.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
+        {/* Services section */}
+        {services.length > 0 && (
+          <div style={{ marginBottom: '40px' }}>
+            <h2 style={{
+              fontFamily: 'Manrope, sans-serif',
+              fontSize: '1.35rem',
+              fontWeight: 800,
+              color: 'var(--ink)',
+              margin: '0 0 16px'
+            }}>
+              Services Offered
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+              {services.map((svc) => (
+                <ServiceCard key={svc.id} service={svc} />
+              ))}
+            </div>
           </div>
         )}
-      </section>
-    </main>
+
+        {/* Reviews section */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{
+              fontFamily: 'Manrope, sans-serif',
+              fontSize: '1.35rem',
+              fontWeight: 800,
+              color: 'var(--ink)',
+              margin: 0
+            }}>
+              Customer Reviews
+            </h2>
+            <span style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', fontWeight: 600 }}>
+              {reviews.length} Total
+            </span>
+          </div>
+
+          {reviews.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '50px 20px',
+              background: 'white',
+              borderRadius: '16px',
+              border: '1px dashed var(--line)',
+              color: 'var(--ink-soft)'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '10px' }}>💬</div>
+              <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 6px', color: 'var(--ink)' }}>
+                No Reviews Yet
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.88rem' }}>
+                Be the first to rate and review this provider after your job is completed.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {reviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

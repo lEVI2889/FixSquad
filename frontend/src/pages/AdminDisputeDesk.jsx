@@ -14,11 +14,26 @@ function Toast({ toast }) {
   const isSuccess = toast.type === 'success';
   return (
     <div
-      className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-lg shadow-xl text-white text-sm font-medium transition-all
-        ${isSuccess ? 'bg-green-600' : 'bg-red-600'}`}
+      style={{
+        position: 'fixed',
+        bottom: '24px',
+        right: '24px',
+        zIndex: 100,
+        padding: '14px 20px',
+        borderRadius: '12px',
+        fontSize: '0.9rem',
+        fontWeight: 600,
+        background: !isSuccess ? '#fff1ed' : '#174d42',
+        color: !isSuccess ? '#9c3a27' : '#d7f7eb',
+        border: `1px solid ${!isSuccess ? '#f0bbae' : '#278b6a'}`,
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+      }}
     >
-      {isSuccess ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
-      {toast.message}
+      {isSuccess ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+      <span>{toast.message}</span>
     </div>
   );
 }
@@ -26,37 +41,65 @@ function Toast({ toast }) {
 // ─── Single Dispute Row ───────────────────────────────────────────────────────
 function DisputeRow({ dispute, onResolve, resolving }) {
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-      <td className="px-4 py-3 text-sm font-mono text-gray-500">#{dispute.id}</td>
-      <td className="px-4 py-3">
-        <div className="font-semibold text-slate-800 text-sm">{dispute.service_name}</div>
+    <tr>
+      <td>
+        <span style={{
+          fontFamily: 'monospace',
+          fontSize: '0.75rem',
+          color: 'var(--ink-soft)',
+          background: '#f4f6f4',
+          padding: '2px 6px',
+          borderRadius: '6px',
+          border: '1px solid var(--line)'
+        }}>
+          #{dispute.id}
+        </span>
       </td>
-      <td className="px-4 py-3">
-        <div className="text-sm text-slate-700">{dispute.customer_name}</div>
-        <div className="text-xs text-gray-400">{dispute.customer_email}</div>
+      <td>
+        <strong style={{ color: 'var(--ink)', fontSize: '0.92rem', display: 'block' }}>{dispute.service_name}</strong>
       </td>
-      <td className="px-4 py-3">
-        <div className="text-sm text-slate-700">{dispute.provider_name}</div>
-        <div className="text-xs text-gray-400">{dispute.provider_email}</div>
+      <td>
+        <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)' }}>{dispute.customer_name}</div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--ink-soft)' }}>{dispute.customer_email}</div>
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td>
+        <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)' }}>{dispute.provider_name}</div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--ink-soft)' }}>{dispute.provider_email}</div>
+      </td>
+      <td style={{ color: 'var(--ink-soft)', fontSize: '0.86rem' }}>
         {formatDate(dispute.scheduled_date)} at {dispute.scheduled_time}
       </td>
-      <td className="px-4 py-3 text-sm font-semibold text-indigo-700">
-        ${Number(dispute.total_price).toFixed(2)}
+      <td>
+        <strong style={{ color: 'var(--forest)', fontSize: '1rem', fontWeight: 800 }}>
+          ৳{Number(dispute.total_price).toFixed(2)}
+        </strong>
       </td>
-      <td className="px-4 py-3">
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+      <td>
+        <span className="badge badge--disputed" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
           <AlertTriangle size={11} /> Disputed
         </span>
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2 flex-wrap">
+      <td style={{ textAlign: 'right' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
           {/* Mark Completed */}
           <button
+            type="button"
             disabled={resolving === dispute.id}
             onClick={() => onResolve(dispute.id, 'Completed')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 disabled:opacity-50 transition-colors"
+            style={{
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: '#eef8f3',
+              color: '#278b6a',
+              border: '1px solid #bce6d4',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'background 0.15s'
+            }}
             title="Mark as Completed"
           >
             <CheckCircle2 size={13} /> Complete
@@ -64,9 +107,23 @@ function DisputeRow({ dispute, onResolve, resolving }) {
 
           {/* Cancel & Refund */}
           <button
+            type="button"
             disabled={resolving === dispute.id}
             onClick={() => onResolve(dispute.id, 'Cancelled')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50 transition-colors"
+            style={{
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: '#fff1ed',
+              color: '#c94c32',
+              border: '1px solid #f0bbae',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'background 0.15s'
+            }}
             title="Cancel & Refund"
           >
             <XCircle size={13} /> Cancel
@@ -74,9 +131,23 @@ function DisputeRow({ dispute, onResolve, resolving }) {
 
           {/* Reopen */}
           <button
+            type="button"
             disabled={resolving === dispute.id}
             onClick={() => onResolve(dispute.id, 'In-Progress')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+            style={{
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: '#fef3c7',
+              color: '#92400e',
+              border: '1px solid #fde68a',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'background 0.15s'
+            }}
             title="Reopen job for provider"
           >
             <RotateCcw size={13} /> Reopen
@@ -140,90 +211,129 @@ export default function AdminDisputeDesk() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <Toast toast={toast} />
+    <section className="dashboard-page">
+      <div className="container">
+        <Toast toast={toast} />
 
-      {/* ── Header ────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-red-100 rounded-xl">
-            <ShieldAlert className="text-red-600" size={24} />
-          </div>
+        {/* ── Header ────────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '28px' }}>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Dispute Resolution Desk</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Admin override — forcefully resolve disputed bookings
+            <p className="eyebrow"><span /> Resolution & Mediation</p>
+            <h1 style={{ 
+              fontFamily: 'Manrope, sans-serif', 
+              fontSize: 'clamp(2rem, 4vw, 2.8rem)', 
+              fontWeight: 800, 
+              letterSpacing: '-0.04em', 
+              margin: '0 0 8px',
+              color: 'var(--ink)'
+            }}>
+              Dispute Resolution Desk
+            </h1>
+            <p style={{ color: 'var(--ink-soft)', margin: 0, fontSize: '1rem' }}>
+              Administrative override — review customer escalation tickets and forcefully update booking states or issue refunds.
             </p>
           </div>
+          <button
+            type="button"
+            onClick={loadDisputes}
+            disabled={loading}
+            className="button button--ghost"
+            style={{ minHeight: '42px', padding: '0 16px', fontSize: '0.88rem' }}
+          >
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+            Refresh Desk
+          </button>
         </div>
-        <button
-          onClick={loadDisputes}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors"
-        >
-          <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+
+        {/* ── Stats Banner ──────────────────────────────────────────────── */}
+        <div style={{
+          background: disputes.length > 0 ? '#fff1ed' : '#eef8f3',
+          border: `1px solid ${disputes.length > 0 ? '#f0bbae' : '#bce6d4'}`,
+          borderRadius: '14px',
+          padding: '14px 18px',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <AlertTriangle style={{ color: disputes.length > 0 ? '#c94c32' : '#278b6a' }} size={20} />
+          <span style={{ fontSize: '0.92rem', fontWeight: 600, color: disputes.length > 0 ? '#9c3a27' : '#123f36' }}>
+            {loading ? 'Checking dispute tickets…' : `${disputes.length} dispute ticket${disputes.length !== 1 ? 's' : ''} require${disputes.length === 1 ? 's' : ''} administrative resolution.`}
+          </span>
+        </div>
+
+        {/* ── Error State ────────────────────────────────────────────────── */}
+        {error && (
+          <div className="form-alert" role="alert" style={{ marginBottom: '24px' }}>
+            {error}
+          </div>
+        )}
+
+        {/* ── Loading Skeleton ───────────────────────────────────────────── */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div className="spinner" />
+            <p style={{ color: 'var(--ink-soft)', fontWeight: 600 }}>Loading active dispute cases...</p>
+          </div>
+        ) : disputes.length === 0 ? (
+          /* ── Empty State ──────────────────────────────────────────────── */
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 24px',
+            background: 'white',
+            borderRadius: '20px',
+            border: '1px solid var(--line)',
+            boxShadow: '0 4px 20px rgba(18, 63, 54, 0.04)'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '16px',
+              background: 'var(--mint-pale)',
+              display: 'grid',
+              placeItems: 'center',
+              margin: '0 auto 16px',
+              color: 'var(--forest)'
+            }}>
+              <CheckCircle2 size={30} aria-hidden="true" />
+            </div>
+            <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.3rem', fontWeight: 800, margin: '0 0 8px', color: 'var(--ink)' }}>
+              All Disputes Cleared
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '420px', margin: '0 auto', fontSize: '0.92rem' }}>
+              There are currently zero open customer or provider dispute escalation tickets requiring admin review.
+            </p>
+          </div>
+        ) : (
+          /* ── Disputes Table ───────────────────────────────────────────── */
+          <div className="brand-table-wrap">
+            <table className="brand-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Service</th>
+                  <th>Customer</th>
+                  <th>Provider</th>
+                  <th>Scheduled</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {disputes.map(dispute => (
+                  <DisputeRow
+                    key={dispute.id}
+                    dispute={dispute}
+                    onResolve={handleResolve}
+                    resolving={resolving}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
-      {/* ── Stats Banner ──────────────────────────────────────────────── */}
-      <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
-        <AlertTriangle className="text-red-500 flex-shrink-0" size={20} />
-        <span className="text-sm text-red-700 font-medium">
-          {loading ? 'Loading…' : `${disputes.length} dispute${disputes.length !== 1 ? 's' : ''} require${disputes.length === 1 ? 's' : ''} admin attention.`}
-        </span>
-      </div>
-
-      {/* ── Error State ────────────────────────────────────────────────── */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">
-          {error}
-        </div>
-      )}
-
-      {/* ── Loading Skeleton ───────────────────────────────────────────── */}
-      {loading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-16 bg-gray-200 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      ) : disputes.length === 0 ? (
-        /* ── Empty State ──────────────────────────────────────────────── */
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <CheckCircle2 size={48} className="mb-3 text-green-400" />
-          <p className="text-lg font-semibold text-slate-600">No active disputes</p>
-          <p className="text-sm mt-1">All bookings are resolved. Great job!</p>
-        </div>
-      ) : (
-        /* ── Disputes Table ───────────────────────────────────────────── */
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Service</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Provider</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {disputes.map(dispute => (
-                <DisputeRow
-                  key={dispute.id}
-                  dispute={dispute}
-                  onResolve={handleResolve}
-                  resolving={resolving}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+    </section>
   );
 }

@@ -50,11 +50,9 @@ function Navbar() {
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>
-            {(!isAuthenticated || user?.role === 'customer') && (
-              <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
-                Book a Service
-              </NavLink>
-            )}
+            <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
+              {user?.role === 'provider' ? 'Browse Catalog' : 'Book a Service'}
+            </NavLink>
             {isAuthenticated && (
               <>
                 <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
@@ -67,7 +65,19 @@ function Navbar() {
                   </NavLink>
                 )}
 
-                
+                {user?.role === 'admin' && (
+                  <>
+                    <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
+                      Categories
+                    </NavLink>
+                    <NavLink className={navLinkClass} to="/admin/security" onClick={closeMenu}>
+                      Security
+                    </NavLink>
+                    <NavLink className={navLinkClass} to="/admin/disputes" onClick={closeMenu}>
+                      Disputes
+                    </NavLink>
+                  </>
+                )}
               </>
             )}
             {isAuthenticated && user?.role === 'provider' && (

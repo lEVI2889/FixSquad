@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { X, Copy, Check, Database, Code, FileText, CheckCircle2 } from 'lucide-react';
 
 export default function ContractInspectorModal({ isOpen, onClose }) {
@@ -23,98 +23,198 @@ export default function ContractInspectorModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-white">Integration Contract: Week 1 (Feature 12)</h2>
-              <p className="text-xs text-slate-400">Naim • Global Category Manager • Target Contract for Rohan, Shan & Wasik</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <div className="booking-modal-overlay" onClick={onClose}>
+      <div 
+        className="booking-modal" 
+        onClick={(e) => e.stopPropagation()} 
+        style={{ maxWidth: '720px', padding: '32px' }}
+      >
+        <button 
+          type="button" 
+          className="modal-close-btn" 
+          onClick={onClose} 
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+
+        <div className="modal-header">
+          <p className="eyebrow" style={{ marginBottom: '8px' }}>
+            <span /> System Architecture & DDL
+          </p>
+          <h2 style={{ margin: '0 0 4px', fontSize: '1.5rem' }}>
+            Integration Contract: Week 1 (Feature 12)
+          </h2>
+          <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem', margin: '0 0 20px' }}>
+            Global Category Manager • Target Contract for Rohan, Shan & Wasik
+          </p>
         </div>
 
-        <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-300">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center">
-                <Database className="w-4 h-4 mr-1.5" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ 
+                fontFamily: 'Manrope, sans-serif', 
+                fontSize: '0.85rem', 
+                fontWeight: 800, 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.05em', 
+                color: 'var(--forest)', 
+                margin: 0, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px' 
+              }}>
+                <Database className="w-4 h-4" />
                 1. Exact Database Schema (Raw SQL)
               </h3>
               <button
+                type="button"
                 onClick={copyContract}
-                className="text-xs flex items-center space-x-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700"
+                style={{
+                  fontSize: '0.78rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  background: '#f4f8f6',
+                  color: 'var(--forest)',
+                  border: '1px solid #c9ded6',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied SQL' : 'Copy DDL'}</span>
               </button>
             </div>
-            <pre className="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-indigo-200 overflow-x-auto">
+            <pre style={{
+              padding: '16px',
+              background: '#f8faf9',
+              borderRadius: '12px',
+              border: '1px solid var(--line)',
+              fontFamily: 'monospace',
+              fontSize: '0.82rem',
+              color: 'var(--ink)',
+              overflowX: 'auto',
+              margin: 0,
+              lineHeight: 1.5
+            }}>
               {rawSqlSchema}
             </pre>
           </div>
 
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2 flex items-center">
-              <Code className="w-4 h-4 mr-1.5" />
+            <h3 style={{ 
+              fontFamily: 'Manrope, sans-serif', 
+              fontSize: '0.85rem', 
+              fontWeight: 800, 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em', 
+              color: 'var(--forest)', 
+              margin: '0 0 8px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px' 
+            }}>
+              <Code className="w-4 h-4" />
               2. Teammate Foreign Key Alignment
             </h3>
-            <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
-              <p>
-                <strong className="text-white">Rohan's Feature 6 (`services` table):</strong>
+            <div style={{
+              background: '#f8faf9',
+              border: '1px solid var(--line)',
+              borderRadius: '12px',
+              padding: '16px',
+              fontSize: '0.84rem'
+            }}>
+              <p style={{ margin: '0 0 6px' }}>
+                <strong style={{ color: 'var(--ink)' }}>Rohan's Feature 6 (`services` table):</strong>
               </p>
-              <p className="font-mono text-purple-300 bg-purple-950/30 p-2 rounded border border-purple-800/30">
+              <p style={{
+                fontFamily: 'monospace',
+                background: '#eef8f3',
+                color: 'var(--forest)',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid #bce6d4',
+                margin: '0 0 8px',
+                fontSize: '0.8rem'
+              }}>
                 category_id INT FOREIGN KEY REFERENCES categories(id)
               </p>
-              <p className="text-slate-400">
-                Guaranteed: Table is <code className="text-white">categories</code>, PK is <code className="text-white">id</code> (type <code className="text-white">INT</code>), name column is <code className="text-white">name</code> (type <code className="text-white">VARCHAR</code>).
+              <p style={{ color: 'var(--ink-soft)', margin: 0, fontSize: '0.82rem' }}>
+                Guaranteed: Table is <code>categories</code>, PK is <code>id</code> (type <code>INT</code>), name column is <code>name</code> (type <code>VARCHAR</code>).
               </p>
             </div>
           </div>
 
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+            <h3 style={{ 
+              fontFamily: 'Manrope, sans-serif', 
+              fontSize: '0.85rem', 
+              fontWeight: 800, 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em', 
+              color: 'var(--forest)', 
+              margin: '0 0 8px' 
+            }}>
               3. API Endpoints Catalog
             </h3>
-            <div className="space-y-2 text-xs font-mono">
-              <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
-                <span className="text-emerald-400">GET /api/categories</span>
-                <span className="text-slate-400 font-sans text-[11px]">Returns array of all categories</span>
-              </div>
-              <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
-                <span className="text-emerald-400">GET /api/categories/:id</span>
-                <span className="text-slate-400 font-sans text-[11px]">Returns single category by ID</span>
-              </div>
-              <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
-                <span className="text-indigo-400">POST /api/categories</span>
-                <span className="text-slate-400 font-sans text-[11px]">Creates a new category</span>
-              </div>
-              <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
-                <span className="text-amber-400">PUT /api/categories/:id</span>
-                <span className="text-slate-400 font-sans text-[11px]">Updates existing category</span>
-              </div>
-              <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
-                <span className="text-rose-400">DELETE /api/categories/:id</span>
-                <span className="text-slate-400 font-sans text-[11px]">Deletes category (FK protected)</span>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                { method: 'GET', path: '/api/categories', desc: 'Returns array of all categories' },
+                { method: 'GET', path: '/api/categories/:id', desc: 'Returns single category by ID' },
+                { method: 'POST', path: '/api/categories', desc: 'Creates a new category' },
+                { method: 'PUT', path: '/api/categories/:id', desc: 'Updates existing category' },
+                { method: 'DELETE', path: '/api/categories/:id', desc: 'Deletes category (FK protected)' }
+              ].map((ep) => (
+                <div key={ep.path + ep.method} style={{
+                  padding: '10px 14px',
+                  background: '#f8faf9',
+                  borderRadius: '10px',
+                  border: '1px solid var(--line)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontSize: '0.82rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      fontWeight: 800,
+                      fontFamily: 'monospace',
+                      fontSize: '0.74rem',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      background: ep.method === 'GET' ? '#dcfce7' : ep.method === 'POST' ? '#e0f2fe' : ep.method === 'PUT' ? '#fef3c7' : '#fee2e2',
+                      color: ep.method === 'GET' ? '#166534' : ep.method === 'POST' ? '#075985' : ep.method === 'PUT' ? '#92400e' : '#991b1b'
+                    }}>
+                      {ep.method}
+                    </span>
+                    <span style={{ fontFamily: 'monospace', color: 'var(--ink)' }}>{ep.path}</span>
+                  </div>
+                  <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>{ep.desc}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-3 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
-          <span>File: <code className="text-indigo-300">Week1_Naim_CONTRACT.md</code> (Excluded from Git)</span>
+        <div style={{
+          marginTop: '24px',
+          paddingTop: '16px',
+          borderTop: '1px solid var(--line)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--ink-soft)' }}>
+            Contract Document: <code>Week1_Naim_CONTRACT.md</code>
+          </span>
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors"
+            className="button button--primary button--small"
           >
             Close Inspector
           </button>
