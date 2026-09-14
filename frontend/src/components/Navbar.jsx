@@ -51,9 +51,9 @@ function Navbar() {
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>
-            {user?.role !== 'admin' && (
+            {(user?.role !== 'admin' && user?.role !== 'provider') && (
               <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
-                {user?.role === 'provider' ? 'Browse Catalog' : 'Book a Service'}
+                Book a Service
               </NavLink>
             )}
             {isAuthenticated && (
