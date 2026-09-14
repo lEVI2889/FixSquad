@@ -13,6 +13,7 @@ function DashboardPage() {
   const isAdmin = user?.role === 'admin';
   const isCustomer = user?.role === 'customer';
   const [analytics, setAnalytics] = useState(null);
+  const [providerEarnings, setProviderEarnings] = useState(null);
 
   useEffect(() => {
     if (isAdmin) {
@@ -20,7 +21,12 @@ function DashboardPage() {
         .then(res => setAnalytics(res.data.data))
         .catch(err => console.error('Failed to fetch analytics', err));
     }
-  }, [isAdmin]);
+    if (isProvider) {
+      api.get('/bookings/provider/earnings')
+        .then(res => setProviderEarnings(res.data.data))
+        .catch(err => console.error('Failed to fetch provider earnings', err));
+    }
+  }, [isAdmin, isProvider]);
 
   return (
     <section className="dashboard-page">
@@ -101,6 +107,21 @@ function DashboardPage() {
           {/* Provider Specific Action Cards */}
           {isProvider && (
             <>
+              {providerEarnings && (
+                <article className="dashboard-card" style={{ gridColumn: '1 / -1', background: '#f8faf8', border: '1px solid #e2e8e0' }}>
+                  <h2 style={{ marginBottom: '15px' }}>Earnings Report</h2>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                    <div style={{ padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                      <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', fontWeight: 'bold' }}>Total Historical Earnings</p>
+                      <p style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#111827' }}>৳{Number(providerEarnings.total_earnings || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                    </div>
+                    <div style={{ padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                      <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', fontWeight: 'bold' }}>Total Completed Jobs</p>
+                      <p style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#111827' }}>{providerEarnings.recent_completed_jobs.length}</p>
+                    </div>
+                  </div>
+                </article>
+              )}
               <article className="dashboard-card dashboard-card--accent">
                 <span className="dashboard-card__icon">
                   <Briefcase size={24} aria-hidden="true" />
