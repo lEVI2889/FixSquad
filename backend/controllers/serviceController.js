@@ -177,7 +177,9 @@ const searchServices = async (req, res) => {
       sql += ` ORDER BY s.created_at DESC`;
     }
 
+    console.log('SQL:', sql, params);
     const [services] = await pool.query(sql, params);
+    console.log('Services length:', services.length);
 
     // Apply in-memory dynamic filter if running on fallback store
     let filtered = services;

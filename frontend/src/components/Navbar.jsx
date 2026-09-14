@@ -113,6 +113,7 @@ function Navbar() {
           <div className="nav-actions">
             {isAuthenticated ? (
               <>
+                <NotificationDropdown />
                 <span className="nav-user">Hi, {user?.name?.split(' ')[0] || 'there'}</span>
                 <button className="button button--ghost" type="button" onClick={handleLogout}>
                   Log out
