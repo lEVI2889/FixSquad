@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
 
 const services = [
   { icon: '⚡', name: 'Electrical', copy: 'Safe repairs and installations' },
@@ -8,6 +9,9 @@ const services = [
 ];
 
 function HomePage() {
+  const { user } = useAuth();
+  const isInternalRole = user?.role === 'admin' || user?.role === 'provider';
+
   return (
     <>
       <section className="hero">
@@ -69,14 +73,26 @@ function HomePage() {
             <p>Start with one of our most requested household services.</p>
           </div>
           <div className="service-grid">
-            {services.map((service) => (
-              <article className="service-card" key={service.name}>
-                <span className="service-card__icon">{service.icon}</span>
-                <h3>{service.name}</h3>
-                <p>{service.copy}</p>
-                <span className="service-card__arrow" aria-hidden="true">↗</span>
-              </article>
-            ))}
+            {services.map((service) => {
+              const CardContent = (
+                <>
+                  <span className="service-card__icon">{service.icon}</span>
+                  <h3>{service.name}</h3>
+                  <p>{service.copy}</p>
+                  {!isInternalRole && <span className="service-card__arrow" aria-hidden="true">↗</span>}
+                </>
+              );
+
+              return isInternalRole ? (
+                <article className="service-card" key={service.name} style={{ cursor: 'default' }}>
+                  {CardContent}
+                </article>
+              ) : (
+                <Link to={`/services?keyword=${service.name}`} className="service-card" key={service.name} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {CardContent}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

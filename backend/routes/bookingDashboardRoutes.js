@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getCustomerBookings, getProviderBookings } = require('../controllers/bookingDashboardController');
+const { getCustomerBookings, getProviderBookings, getProviderEarnings } = require('../controllers/bookingDashboardController');
 
 // Mounted at the same /api/bookings prefix as Rohan's existing
 // bookingRoutes.js, as a SECOND router — see Week2_Shan_CONTRACT.md,
@@ -10,4 +10,5 @@ const { getCustomerBookings, getProviderBookings } = require('../controllers/boo
 router.get('/customer/mine', getCustomerBookings);
 router.get('/provider/mine', getProviderBookings);
 
+router.get("/provider/earnings", getProviderEarnings);
 module.exports = router;

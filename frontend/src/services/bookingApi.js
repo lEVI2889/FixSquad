@@ -36,3 +36,38 @@ export async function updateBookingStatus(bookingId, status) {
   });
   return handleResponse(res);
 }
+
+export async function cancelCustomerBooking(bookingId) {
+  const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
+    method: 'PUT',
+    headers: authHeaders()
+  });
+  return handleResponse(res);
+}
+
+export async function submitReview(reviewData) {
+  const res = await fetch('/api/reviews', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(reviewData)
+  });
+  return handleResponse(res);
+}
+
+export async function submitDispute(disputeData) {
+  const res = await fetch('/api/disputes', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(disputeData)
+  });
+  return handleResponse(res);
+}
+
+export async function fetchBookingReview(bookingId) {
+  const res = await fetch(`/api/reviews/booking/${bookingId}`, {
+    headers: authHeaders()
+  });
+  const data = await handleResponse(res);
+  return data.data;
+}
+

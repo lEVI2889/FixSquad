@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
     fetchPendingBookings, updateBookingStatus, 
-    fetchAvailability, addAvailabilityBlock, removeAvailabilityBlock 
+    fetchAvailability, addAvailabilityBlock, removeAvailabilityBlock, updateQuote 
 } from '../services/api';
+import ProviderZoneManager from '../components/ProviderZoneManager';
 
 const ProviderOperations = () => {
     const [bookings, setBookings] = useState([]);
@@ -11,6 +12,7 @@ const ProviderOperations = () => {
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     
     const [blockForm, setBlockForm] = useState({ date: '', start_time: '', end_time: '' });
+    const [quoteForms, setQuoteForms] = useState({});
 
     useEffect(() => {
         loadBookings();
@@ -50,6 +52,17 @@ const ProviderOperations = () => {
         }
     };
 
+
+    const handleQuote = async (id, e) => {
+        e.preventDefault();
+        try {
+            await updateQuote(id, quoteForms[id]);
+            loadBookings();
+        } catch (error) {
+            console.error('Failed to submit quote', error);
+        }
+    };
+
     const handleAddBlock = async (e) => {
         e.preventDefault();
         try {
@@ -71,98 +84,259 @@ const ProviderOperations = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Provider Operations</h1>
-                <p className="mt-2 text-sm text-gray-500">Manage your incoming booking requests and your calendar availability.</p>
-            </div>
+        <section className="dashboard-page">
+            <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+                <div>
+                    <p className="eyebrow"><span /> Operations & Dispatch</p>
+                    <h1 style={{ 
+                        fontFamily: 'Manrope, sans-serif', 
+                        fontSize: 'clamp(2rem, 4vw, 2.8rem)', 
+                        fontWeight: 800, 
+                        letterSpacing: '-0.04em',
+                        margin: '0 0 8px',
+                        color: 'var(--ink)'
+                    }}>
+                        Provider Operations
+                    </h1>
+                    <p style={{ color: 'var(--ink-soft)', margin: 0, maxWidth: '640px', fontSize: '1rem', lineHeight: 1.6 }}>
+                        Manage incoming booking requests from local customers and schedule blocked-out hours to keep your availability calendar up to date.
+                    </p>
+                </div>
 
-            <section>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Booking Requests (Feature 7)</h2>
-                {loadingBookings ? (
-                    <p>Loading bookings...</p>
-                ) : bookings.length === 0 ? (
-                    <p className="text-gray-500">No pending booking requests.</p>
-                ) : (
-                    <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-300">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Service</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Customer</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date/Time</th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price (BDT)</th>
-                                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Actions</span></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
-                                {bookings.map((b) => (
-                                    <tr key={b.id}>
-                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">{b.service_name}</td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{b.customer_name}</td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{new Date(b.scheduled_date).toLocaleDateString()} {b.scheduled_time}</td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{b.total_price}</td>
-                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
-                                            <button onClick={() => handleUpdateStatus(b.id, 'Accepted')} className="text-green-600 hover:text-green-900">Accept</button>
-                                            <button onClick={() => handleUpdateStatus(b.id, 'Rejected')} className="text-red-600 hover:text-red-900">Reject</button>
-                                        </td>
+                {/* Booking Requests Section */}
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+                        <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.35rem', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                            Incoming Booking Requests
+                        </h2>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 700, padding: '4px 10px', background: bookings.length > 0 ? '#fff1ed' : '#eef8f3', color: bookings.length > 0 ? '#9c3a27' : '#278b6a', borderRadius: '20px' }}>
+                            {bookings.length} Pending
+                        </span>
+                    </div>
+
+                    {loadingBookings ? (
+                        <div style={{ textAlign: 'center', padding: '50px 20px', background: 'white', borderRadius: '16px', border: '1px solid var(--line)' }}>
+                            <div className="spinner" style={{ width: '32px', height: '32px' }} />
+                            <p style={{ color: 'var(--ink-soft)', margin: '10px 0 0', fontSize: '0.9rem' }}>Loading incoming requests...</p>
+                        </div>
+                    ) : bookings.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '48px 20px',
+                            background: 'white',
+                            borderRadius: '16px',
+                            border: '1px solid var(--line)',
+                            color: 'var(--ink-soft)'
+                        }}>
+                            <p style={{ margin: 0, fontWeight: 600 }}>No pending booking requests right now. New requests will appear here in real time.</p>
+                        </div>
+                    ) : (
+                        <div className="brand-table-wrap">
+                            <table className="brand-table">
+                                <thead>
+                                    <tr>
+                                        <th>Service Requested</th>
+                                        <th>Customer</th>
+                                        <th>Scheduled Date/Time</th>
+                                        <th>Base Price</th>
+                                        <th style={{ textAlign: 'right' }}>Action</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </section>
+                                </thead>
+                                <tbody>
+                                    {bookings.map((b) => (
+                                        <tr key={b.id}>
+                                            <td><strong style={{ color: 'var(--ink)' }}>{b.service_name}</strong></td>
+                                            <td style={{ color: 'var(--ink-soft)' }}>{b.customer_name}</td>
+                                            <td style={{ color: 'var(--ink-soft)' }}>
+                                                {new Date(b.scheduled_date).toLocaleDateString()} at {b.scheduled_time}
+                                            </td>
+                                            <td>
+                                                <form onSubmit={(e) => handleQuote(b.id, e)} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                                    <span style={{ color: 'var(--forest)', fontWeight: 700 }}>৳</span>
+                                                    <input 
+                                                        type="number"
+                                                        min="0"
+                                                        value={quoteForms[b.id] !== undefined ? quoteForms[b.id] : (b.total_price || '')}
+                                                        onChange={(e) => setQuoteForms({...quoteForms, [b.id]: e.target.value})}
+                                                        style={{ width: '70px', padding: '6px 8px', border: '1px solid var(--line)', borderRadius: '6px', fontFamily: 'inherit' }}
+                                                    />
+                                                    <button type="submit" style={{ padding: '6px 10px', background: '#eef8f3', color: 'var(--forest)', border: '1px solid #c0e3d6', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}>
+                                                        Send Quote
+                                                    </button>
+                                                </form>
+                                            </td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                <div style={{ display: 'inline-flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => handleUpdateStatus(b.id, 'Accepted')}
+                                                        style={{
+                                                            background: 'var(--forest)',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            padding: '6px 14px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '0.82rem',
+                                                            fontWeight: 700,
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => handleUpdateStatus(b.id, 'Rejected')}
+                                                        style={{
+                                                            background: '#fff1ed',
+                                                            color: '#c94c32',
+                                                            border: '1px solid #f0bbae',
+                                                            padding: '6px 14px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '0.82rem',
+                                                            fontWeight: 700,
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
 
-            <section>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Availability Calendar (Feature 8)</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Block Out Time</h3>
-                        <form onSubmit={handleAddBlock} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Date</label>
-                                <input type="date" required value={blockForm.date} onChange={(e) => setBlockForm({...blockForm, date: e.target.value})} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                {/* Availability Calendar Section */}
+                <div>
+                    <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.35rem', fontWeight: 800, margin: '0 0 16px', color: 'var(--ink)' }}>
+                        Availability & Calendar Management
+                    </h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                        {/* Block Out Time Form */}
+                        <div style={{
+                            background: 'white',
+                            padding: '24px',
+                            borderRadius: '16px',
+                            border: '1px solid var(--line)',
+                            boxShadow: '0 2px 10px rgba(18, 63, 54, 0.04)'
+                        }}>
+                            <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 14px', color: 'var(--ink)' }}>
+                                Block Out Time Slot
+                            </h3>
+                            <form onSubmit={handleAddBlock} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Start Time</label>
-                                    <input type="time" required value={blockForm.start_time} onChange={(e) => setBlockForm({...blockForm, start_time: e.target.value})} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" />
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '4px' }}>Date</label>
+                                    <input 
+                                        type="date" 
+                                        required 
+                                        value={blockForm.date} 
+                                        onChange={(e) => setBlockForm({...blockForm, date: e.target.value})} 
+                                        style={{ width: '100%', height: '42px', padding: '0 12px', border: '1px solid var(--line)', borderRadius: '8px', background: '#fafaf7' }}
+                                    />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">End Time</label>
-                                    <input type="time" required value={blockForm.end_time} onChange={(e) => setBlockForm({...blockForm, end_time: e.target.value})} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '4px' }}>Start Time</label>
+                                        <input 
+                                            type="time" 
+                                            required 
+                                            value={blockForm.start_time} 
+                                            onChange={(e) => setBlockForm({...blockForm, start_time: e.target.value})} 
+                                            style={{ width: '100%', height: '42px', padding: '0 12px', border: '1px solid var(--line)', borderRadius: '8px', background: '#fafaf7' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '4px' }}>End Time</label>
+                                        <input 
+                                            type="time" 
+                                            required 
+                                            value={blockForm.end_time} 
+                                            onChange={(e) => setBlockForm({...blockForm, end_time: e.target.value})} 
+                                            style={{ width: '100%', height: '42px', padding: '0 12px', border: '1px solid var(--line)', borderRadius: '8px', background: '#fafaf7' }}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                Add Block
-                            </button>
-                        </form>
-                    </div>
+                                <button 
+                                    type="submit" 
+                                    className="button button--primary"
+                                    style={{ width: '100%', marginTop: '6px' }}
+                                >
+                                    + Add Calendar Block
+                                </button>
+                            </form>
+                        </div>
 
-                    <div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Blocked Dates</h3>
-                        {loadingAvailability ? (
-                            <p>Loading...</p>
-                        ) : availability.length === 0 ? (
-                            <p className="text-gray-500">No dates blocked.</p>
-                        ) : (
-                            <ul className="space-y-3">
-                                {availability.map((block) => (
-                                    <li key={block.id} className="bg-white shadow overflow-hidden rounded-md px-4 py-3 flex items-center justify-between border border-gray-200">
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900">{new Date(block.date).toLocaleDateString()}</p>
-                                            <p className="text-sm text-gray-500">{block.start_time} - {block.end_time}</p>
-                                        </div>
-                                        <button onClick={() => handleRemoveBlock(block.id)} className="text-red-500 hover:text-red-700 text-sm font-medium">Remove</button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        {/* Blocked Dates List */}
+                        <div style={{
+                            background: 'white',
+                            padding: '24px',
+                            borderRadius: '16px',
+                            border: '1px solid var(--line)',
+                            boxShadow: '0 2px 10px rgba(18, 63, 54, 0.04)'
+                        }}>
+                            <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 14px', color: 'var(--ink)' }}>
+                                Current Calendar Blocks
+                            </h3>
+                            {loadingAvailability ? (
+                                <div style={{ textAlign: 'center', padding: '30px 0' }}>
+                                    <div className="spinner" style={{ width: '28px', height: '28px' }} />
+                                    <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem', margin: '8px 0 0' }}>Loading calendar blocks...</p>
+                                </div>
+                            ) : availability.length === 0 ? (
+                                <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', fontStyle: 'italic', margin: '20px 0' }}>
+                                    No dates or times currently blocked. Customers can book all standard slots.
+                                </p>
+                            ) : (
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    {availability.map((block) => (
+                                        <li key={block.id} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '12px 16px',
+                                            background: '#fafaf7',
+                                            border: '1px solid var(--line)',
+                                            borderRadius: '10px'
+                                        }}>
+                                            <div>
+                                                <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--ink)' }}>
+                                                    {new Date(block.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </strong>
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
+                                                    {block.start_time} – {block.end_time}
+                                                </span>
+                                            </div>
+                                            <button 
+                                                type="button"
+                                                onClick={() => handleRemoveBlock(block.id)} 
+                                                style={{
+                                                    background: '#fff1ed',
+                                                    color: '#c94c32',
+                                                    border: '1px solid #f0bbae',
+                                                    borderRadius: '6px',
+                                                    padding: '4px 10px',
+                                                    fontSize: '0.78rem',
+                                                    fontWeight: 700,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </section>
-        </div>
+
+                {/* Service Zones Component */}
+                <ProviderZoneManager />
+            </div>
+        </section>
     );
 };
 

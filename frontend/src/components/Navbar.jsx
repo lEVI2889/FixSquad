@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import NotificationDropdown from './NotificationDropdown';
 import BrandMark from './BrandMark';
 
 const navLinkClass = ({ isActive }) =>
@@ -50,9 +51,11 @@ function Navbar() {
             <a className="nav-link" href="/#how-it-works" onClick={closeMenu}>
               How it works
             </a>
-            <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
-              Book a Service
-            </NavLink>
+            {(user?.role !== 'admin' && user?.role !== 'provider') && (
+              <NavLink className={navLinkClass} to="/services" onClick={closeMenu}>
+                Book a Service
+              </NavLink>
+            )}
             {isAuthenticated && (
               <>
                 <NavLink className={navLinkClass} to="/dashboard" onClick={closeMenu}>
@@ -66,9 +69,17 @@ function Navbar() {
                 )}
 
                 {user?.role === 'admin' && (
-                  <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
-                    Categories
-                  </NavLink>
+                  <>
+                    <NavLink className={navLinkClass} to="/admin/categories" onClick={closeMenu}>
+                      Categories
+                    </NavLink>
+                    <NavLink className={navLinkClass} to="/admin/security" onClick={closeMenu}>
+                      Security
+                    </NavLink>
+                    <NavLink className={navLinkClass} to="/admin/disputes" onClick={closeMenu}>
+                      Disputes
+                    </NavLink>
+                  </>
                 )}
               </>
             )}
@@ -102,6 +113,7 @@ function Navbar() {
           <div className="nav-actions">
             {isAuthenticated ? (
               <>
+                <NotificationDropdown />
                 <span className="nav-user">Hi, {user?.name?.split(' ')[0] || 'there'}</span>
                 <button className="button button--ghost" type="button" onClick={handleLogout}>
                   Log out
