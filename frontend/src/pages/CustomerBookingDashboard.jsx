@@ -17,7 +17,7 @@ function formatDate(dateStr) {
   return Number.isNaN(d.getTime()) ? dateStr : d.toLocaleDateString();
 }
 
-function BookingCard({ booking, onMessage, onInvoice, onCancel, onRate, onDispute }) {
+function BookingCard({ booking, onMessage, onInvoice, onCancel, onRate, onDispute, onQuoteResponse }) {
   const [cancelling, setCancelling] = useState(false);
 
   const handleCancelClick = async () => {
@@ -65,32 +65,49 @@ function BookingCard({ booking, onMessage, onInvoice, onCancel, onRate, onDisput
       {booking.total_price != null && (
         <div className="booking-card__price-row">
           <span>Amount Payable</span>
-          <strong>৳{Number(booking.total_price).toFixed(2)}</strong>
+          <div style={{ textAlign: 'right' }}>
+            <strong style={{ textDecoration: booking.quoted_price ? 'line-through' : 'none', color: booking.quoted_price ? 'var(--ink-soft)' : 'inherit' }}>
+                ৳{Number(booking.total_price).toFixed(2)}
+            </strong>
+            {booking.quoted_price && (
+                <strong style={{ display: 'block', color: 'var(--forest)' }}>
+                    New Quote: ৳{Number(booking.quoted_price).toFixed(2)}
+                </strong>
+            )}
+          </div>
         </div>
       )}
 
       {/* Action Buttons */}
       <div className="booking-card__actions">
         {booking.status === 'Pending' && (
-          <button
-            type="button"
-            onClick={handleCancelClick}
-            disabled={cancelling}
-            style={{
-              width: '100%',
-              minHeight: '36px',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              background: '#fff1ed',
-              color: '#c94c32',
-              border: '1px solid #f0bbae',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            {cancelling ? 'Cancelling...' : 'Cancel Request'}
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+              {booking.quoted_price && (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={() => onQuoteResponse(booking.id, 'Accepted')} style={{ flex: 1, padding: '6px', background: 'var(--forest)', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Accept Quote</button>
+                      <button onClick={() => onQuoteResponse(booking.id, 'Rejected')} style={{ flex: 1, padding: '6px', background: '#fff1ed', color: '#c94c32', borderRadius: '6px', border: '1px solid #f0bbae', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Reject Quote</button>
+                  </div>
+              )}
+              <button
+                type="button"
+                onClick={handleCancelClick}
+                disabled={cancelling}
+                style={{
+                  width: '100%',
+                  minHeight: '36px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  background: '#fff1ed',
+                  color: '#c94c32',
+                  border: '1px solid #f0bbae',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                {cancelling ? 'Cancelling...' : 'Cancel Request'}
+              </button>
+          </div>
         )}
 
         {(booking.status === 'Accepted' || booking.status === 'In-Progress') && (
@@ -195,6 +212,15 @@ export default function CustomerBookingDashboard() {
   useEffect(() => {
     loadBookings();
   }, []);
+
+  const handleQuoteResponse = async (bookingId, response) => {
+    try {
+        await respondToQuote(bookingId, response);
+        loadBookings();
+    } catch (e) {
+        alert(e.message || 'Failed to respond to quote');
+    }
+  };
 
   const handleCancelBooking = async (bookingId) => {
     try {
@@ -323,6 +349,7 @@ export default function CustomerBookingDashboard() {
                       onCancel={handleCancelBooking}
                       onRate={setRatingTargetBooking}
                       onDispute={setDisputeTargetBooking}
+                      onQuoteResponse={handleQuoteResponse}
                     />
                   ))
                 )}
