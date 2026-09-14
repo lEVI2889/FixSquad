@@ -4,12 +4,23 @@ import {
   CalendarCheck, Home, ArrowRight, User 
 } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 function DashboardPage() {
   const { user } = useAuth();
   const isProvider = user?.role === 'provider';
   const isAdmin = user?.role === 'admin';
   const isCustomer = user?.role === 'customer';
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    if (isAdmin) {
+      api.get('/admin/analytics')
+        .then(res => setAnalytics(res.data.data))
+        .catch(err => console.error('Failed to fetch analytics', err));
+    }
+  }, [isAdmin]);
 
   return (
     <section className="dashboard-page">
@@ -25,6 +36,27 @@ function DashboardPage() {
         </div>
         
         <div className="dashboard-grid">
+          
+          {isAdmin && analytics && (
+            <article className="dashboard-card" style={{ gridColumn: '1 / -1', background: '#f8faf8', border: '1px solid #e2e8e0' }}>
+              <h2 style={{ marginBottom: '15px' }}>Platform Analytics Overview</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                <div style={{ padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                  <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', fontWeight: 'bold' }}>Total Transaction Volume</p>
+                  <p style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#111827' }}>৳{Number(analytics.transaction_volume).toLocaleString()}</p>
+                </div>
+                <div style={{ padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                  <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', fontWeight: 'bold' }}>Total Active Jobs</p>
+                  <p style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#111827' }}>{analytics.active_jobs}</p>
+                </div>
+                <div style={{ padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                  <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', fontWeight: 'bold' }}>Total Users</p>
+                  <p style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#111827' }}>{analytics.total_users}</p>
+                </div>
+              </div>
+            </article>
+          )}
+
           {/* Admin Specific Action Cards - Preserved as requested */}
           {isAdmin && (
             <>

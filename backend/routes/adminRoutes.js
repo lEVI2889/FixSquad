@@ -16,4 +16,6 @@ router.get('/users', getAllUsers);
 router.get('/disputes', getDisputedBookings);
 router.put('/disputes/:id/resolve', resolveDispute);
 
+router.get('/analytics', protect, adminAuth, getAnalyticsOverview);
+
 module.exports = router;

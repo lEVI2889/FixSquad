@@ -203,3 +203,48 @@ exports.resolveDispute = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error while resolving dispute.' });
   }
 };
+
+
+exports.getAnalyticsOverview = async (req, res) => {
+  try {
+    const transactionSql = `
+      SELECT SUM(total_price) as total_volume 
+      FROM bookings 
+      WHERE status = 'Completed'
+    `;
+    const [transactions] = await pool.query(transactionSql);
+    
+    const usersSql = `
+      SELECT role, COUNT(*) as count 
+      FROM users 
+      GROUP BY role
+    `;
+    const [users] = await pool.query(usersSql);
+    let totalUsers = 0;
+    users.forEach(u => totalUsers += u.count);
+
+    const jobsSql = `
+      SELECT status, COUNT(*) as count 
+      FROM bookings 
+      WHERE status IN ('Pending', 'Accepted', 'In-Progress')
+      GROUP BY status
+    `;
+    const [jobs] = await pool.query(jobsSql);
+    let activeJobs = 0;
+    jobs.forEach(j => activeJobs += j.count);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        transaction_volume: transactions[0].total_volume || 0,
+        total_users: totalUsers,
+        active_jobs: activeJobs,
+        user_breakdown: users,
+        job_breakdown: jobs
+      }
+    });
+  } catch (err) {
+    console.error('getAnalyticsOverview error:', err.message);
+    return res.status(500).json({ success: false, message: 'Server error while fetching analytics.' });
+  }
+};
