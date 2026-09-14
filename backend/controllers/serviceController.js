@@ -128,8 +128,8 @@ const searchServices = async (req, res) => {
         c.name AS category_name,
         c.icon AS category_icon,
         u.name AS provider_name,
-        4.8 AS provider_rating,
-        12 AS total_reviews
+        u.rating AS provider_rating,
+        (SELECT COUNT(*) FROM reviews r WHERE r.provider_id = u.id) AS total_reviews
       FROM services s
       LEFT JOIN categories c ON s.category_id = c.id
       LEFT JOIN users u ON s.provider_id = u.id
@@ -234,8 +234,8 @@ const getServiceById = async (req, res) => {
         c.name AS category_name,
         c.icon AS category_icon,
         u.name AS provider_name,
-        4.8 AS provider_rating,
-        12 AS total_reviews
+        u.rating AS provider_rating,
+        (SELECT COUNT(*) FROM reviews r WHERE r.provider_id = u.id) AS total_reviews
       FROM services s
       LEFT JOIN categories c ON s.category_id = c.id
       LEFT JOIN users u ON s.provider_id = u.id

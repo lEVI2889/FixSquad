@@ -98,3 +98,38 @@ const getProviderBookings = async (req, res) => {
 };
 
 module.exports = { getCustomerBookings, getProviderBookings };
+
+const getProviderEarnings = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT SUM(total_price) as total_earnings
+       FROM bookings 
+       WHERE provider_id = ? AND status = 'Completed'`,
+      [req.user.id]
+    );
+
+    const [recentJobs] = await pool.query(
+      `SELECT b.id, b.total_price, b.scheduled_date, s.name as service_name, u.name as customer_name
+       FROM bookings b
+       JOIN services s ON s.id = b.service_id
+       JOIN users u ON u.id = b.customer_id
+       WHERE b.provider_id = ? AND b.status = 'Completed'
+       ORDER BY b.scheduled_date DESC, b.scheduled_time DESC
+       LIMIT 5`,
+      [req.user.id]
+    );
+
+    return res.status(200).json({ 
+      success: true, 
+      data: {
+        total_earnings: rows[0].total_earnings || 0,
+        recent_completed_jobs: recentJobs
+      }
+    });
+  } catch (err) {
+    console.error('getProviderEarnings error:', err.message);
+    return res.status(500).json({ success: false, message: 'Server error fetching earnings' });
+  }
+};
+
+module.exports.getProviderEarnings = getProviderEarnings;

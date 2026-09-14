@@ -229,6 +229,9 @@ exports.createBooking = async (req, res) => {
 
     const newBookingId = result.insertId;
 
+    const { createNotification } = require('./notificationController');
+    await createNotification(targetProviderId, `You have a new booking request for ${service.name}.`, 'booking_request');
+
     return res.status(201).json({
       success: true,
       message: 'Booking created successfully! Your request is pending provider confirmation.',
