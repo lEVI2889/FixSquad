@@ -151,11 +151,11 @@ export const fetchDisputedBookings = async () => {
 
 export const updateQuote = async (bookingId, quotedPrice) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(\`\${API_URL}/bookings/\${bookingId}/quote\`, {
+    const res = await fetch(`${API_URL}/bookings/${bookingId}/quote`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: \`Bearer \${token}\`
+            Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ quoted_price: quotedPrice })
     });
@@ -164,11 +164,11 @@ export const updateQuote = async (bookingId, quotedPrice) => {
 
 export const respondToQuote = async (bookingId, accept) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(\`\${API_URL}/bookings/\${bookingId}/quote-respond\`, {
+    const res = await fetch(`${API_URL}/bookings/${bookingId}/quote-respond`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: \`Bearer \${token}\`
+            Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ accept })
     });
