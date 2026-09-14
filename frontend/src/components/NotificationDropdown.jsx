@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
-import { API_URL } from '../services/api';
+import api from '../services/api';
 
 export default function NotificationDropdown() {
     const [notifications, setNotifications] = useState([]);
@@ -9,11 +9,9 @@ export default function NotificationDropdown() {
 
     const fetchNotifications = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_URL}/notifications`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
+            
+            const res = await api.get('/notifications');
+            const data = res.data;
             if (data.success) {
                 setNotifications(data.data);
             }
@@ -24,11 +22,8 @@ export default function NotificationDropdown() {
 
     const markAsRead = async (id) => {
         try {
-            const token = localStorage.getItem('token');
-            await fetch(`${API_URL}/notifications/${id}/read`, {
-                method: 'PUT',
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            
+            await api.put(`/notifications/${id}/read`);
             setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: 1 } : n));
         } catch (error) {
             console.error('Failed to mark read', error);
