@@ -6,7 +6,8 @@ const {
   toggleUserSuspension,
   getAllUsers,
   getDisputedBookings,
-  resolveDispute
+  resolveDispute,
+  getAnalyticsOverview
 } = require('../controllers/adminController');
 
 router.get('/providers/unverified', getUnverifiedProviders);
@@ -16,6 +17,6 @@ router.get('/users', getAllUsers);
 router.get('/disputes', getDisputedBookings);
 router.put('/disputes/:id/resolve', resolveDispute);
 
-router.get('/analytics', protect, adminAuth, getAnalyticsOverview);
+router.get('/analytics', getAnalyticsOverview);
 
 module.exports = router;
