@@ -151,9 +151,19 @@ const ProviderOperations = () => {
                                                 {new Date(b.scheduled_date).toLocaleDateString()} at {b.scheduled_time}
                                             </td>
                                             <td>
-                                                <strong style={{ color: 'var(--forest)', fontSize: '0.95rem' }}>
-                                                    ৳{Number(b.total_price || 0).toFixed(2)}
-                                                </strong>
+                                                <form onSubmit={(e) => handleQuote(b.id, e)} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                                    <span style={{ color: 'var(--forest)', fontWeight: 700 }}>৳</span>
+                                                    <input 
+                                                        type="number"
+                                                        min="0"
+                                                        value={quoteForms[b.id] !== undefined ? quoteForms[b.id] : (b.total_price || '')}
+                                                        onChange={(e) => setQuoteForms({...quoteForms, [b.id]: e.target.value})}
+                                                        style={{ width: '70px', padding: '6px 8px', border: '1px solid var(--line)', borderRadius: '6px', fontFamily: 'inherit' }}
+                                                    />
+                                                    <button type="submit" style={{ padding: '6px 10px', background: '#eef8f3', color: 'var(--forest)', border: '1px solid #c0e3d6', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}>
+                                                        Send Quote
+                                                    </button>
+                                                </form>
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 <div style={{ display: 'inline-flex', gap: '8px', justifyContent: 'flex-end' }}>
