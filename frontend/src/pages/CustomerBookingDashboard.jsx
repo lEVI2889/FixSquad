@@ -84,8 +84,8 @@ function BookingCard({ booking, onMessage, onInvoice, onCancel, onRate, onDisput
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
               {booking.quoted_price && (
                   <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => onQuoteResponse(booking.id, 'Accepted')} style={{ flex: 1, padding: '6px', background: 'var(--forest)', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Accept Quote</button>
-                      <button onClick={() => onQuoteResponse(booking.id, 'Rejected')} style={{ flex: 1, padding: '6px', background: '#fff1ed', color: '#c94c32', borderRadius: '6px', border: '1px solid #f0bbae', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Reject Quote</button>
+                      <button onClick={() => onQuoteResponse(booking.id, true)} style={{ flex: 1, padding: '6px', background: 'var(--forest)', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Accept Quote</button>
+                      <button onClick={() => onQuoteResponse(booking.id, false)} style={{ flex: 1, padding: '6px', background: '#fff1ed', color: '#c94c32', borderRadius: '6px', border: '1px solid #f0bbae', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>Reject Quote</button>
                   </div>
               )}
               <button
